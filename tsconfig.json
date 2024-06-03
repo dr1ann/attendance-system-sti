@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/login/page.tsx", "src/app/faculty-admin/dashboard/loading.jsx", "src/app/api/login/route.js", "src/app/faculty-admin/student-assistants/loading.jsx", "src/app/faculty-admin/profile/loading.jsx"],
   "exclude": ["node_modules"]
 }

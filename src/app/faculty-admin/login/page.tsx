@@ -1,25 +1,25 @@
 'use client'
 
-//components
+//Client Components
 import Footer from "@/app/components/Footer";
-import PageLoader from "./components/PageLoader";
 
 //External Libraries
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from 'next/navigation'; // Correct import for `useRouter`
 import { useEffect, useState } from "react";
-import { BeatLoader } from "react-spinners";
+import PageLoader from "@/app/components/PageLoader";
 
 //Images
 import logo from '@/app/Images/logo.png';
-import studentassistant from '@/app/Images/studentassistant.png';
+import facultyadmin from '@/app/Images/admin.png';
 
 
 //type
 interface ApiResponseType {
   message?: string | undefined
   status?: number | undefined
+ 
 }
 
 const Page = () => {
@@ -112,7 +112,7 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
           return;
       }
     
-      const loginResponse = await fetch('/api/login-student', {
+      const loginResponse = await fetch('/api/login-faculty', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -128,12 +128,12 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
       });
       const loginData: ApiResponseType = await loginResponse.json();
       const userData: ApiResponseType = await userRoleResponse.json();
-      if (loginResponse?.status === 200 &&  userData?.message === 'USER IS STUDENT') {
+      if (loginResponse?.status === 200 &&  userData?.message === 'USER IS FACULTY') {
           setIsInvalidCreds(false);
           setIsUsernameEmpty(false);
           setIsPasswordEmpty(false);
           setError('');
-          router.push('/student-assistant/dashboard');
+          router.push('/faculty-admin/dashboard');
       } else {
           setIsInvalidCreds(true);
           setError(loginData?.message);
@@ -168,8 +168,8 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         <div className="flex flex-col justify-center items-center bigscreens:items-start flex-grow w-full lg:w-auto">
           <div className="flex justify-center items-center w-full max-w-[400px] mx-auto lg:mx-4 2xl:mr-auto bigscreens:mx-0 bg-white pt-2 flex-col shadow rounded-md drop-shadow">
             <div className="flex flex-col gap-2 justify-center items-center">
-              <Image src={studentassistant} className="w-24 smallerscreens:w-32 rounded-md mx-2 lg:mx-0 h-auto " alt="" />
-              <h1 className="text-center pt-2 px-2  text-sm sm:text-lg font-bold">LOGIN AS STUDENT ASSISTANT</h1>
+              <Image src={facultyadmin} className="w-24 smallerscreens:w-32 rounded-md mx-2 lg:mx-0 h-auto " alt="" />
+              <h1 className="text-center pt-2 px-2  text-sm sm:text-lg font-bold">LOGIN AS FACULTY ADMIN</h1>
             </div>
             <form className={`w-full px-6 lg:px-10 pt-6 pb-4 `} onSubmit={handleLogin}>
               

@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+enum UserRole {
+  FACULTY
+  STUDENT
+}
+
+model User {
+  id             String   @id @default(cuid())
+  studentId      String?  @unique
+  name           String
+  username       String   @unique
+  password       String
+  academicLevel  String?
+  section        String?
+  program        String?
+  yearLevel      String?
+  role           UserRole @default(STUDENT)
+  gender         String?
+  createdAt     DateTime @default(now())
+  @@index([role])
+}
+
+
+
+
