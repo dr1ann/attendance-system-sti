@@ -166,7 +166,7 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
           <h2 style={{ textShadow: '2px 4px 3px rgba(44, 56, 74, 0.3)' }} className="px-4 lg:px-0 font-black text-xl  text-center text-black">ASSISTANT-DRIVEN ATTENDANCE SYSTEM</h2>
         </Link>
         <div className="flex flex-col justify-center items-center bigscreens:items-start flex-grow w-full lg:w-auto">
-          <div className="flex justify-center items-center w-full max-w-[400px] mx-auto lg:mx-4 2xl:mr-auto bigscreens:mx-0 bg-white pt-2 flex-col shadow rounded-md drop-shadow">
+          <div className="flex justify-center items-center w-full max-w-[400px] mx-auto lg:mx-4 2xl:mr-auto bigscreens:mx-0 bg-[#fff000] pt-2 flex-col shadow rounded-md drop-shadow">
             <div className="flex flex-col gap-2 justify-center items-center">
               <Image src={studentassistant} className="w-24 smallerscreens:w-32 rounded-md mx-2 lg:mx-0 h-auto " alt="" />
               <h1 className="text-center pt-2 px-2  text-sm sm:text-lg font-bold">LOGIN AS STUDENT ASSISTANT</h1>

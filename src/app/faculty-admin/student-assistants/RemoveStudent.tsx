@@ -66,8 +66,10 @@ const RemoveStudent: React.FC<ModalProps> = ({ id, setRefetch }) => {
         setIsRemoveBtnPressed(false);
         setIsConfirmationShown(false);
         setIsStudentRemoved(false);
-        setIsModalOpen(false);
         setKey(Math.random()); // Add this line to force a re-render of the modal
+        setTimeout(() => {
+          setIsModalOpen(false); // PUT DELAY ON CLOSING THE MODAL
+        }, 1000)
       }, 2500);
       
     }

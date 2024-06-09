@@ -25,9 +25,9 @@ const PaginationControls: FC<PaginationControlsProps> = (
   return (
     <div className='flex gap-2 items-center justify-center mt-4'>
       <button
-      className={`text-xs lg:text-sm shadow border-[1px] border-[#D9D9D9] w-fit my-4 rounded-lg px-3 py-1 cursor-pointer flex justify-center flex-row items-center gap-1 ${
+      className={`text-xs lg:text-sm shadow border-[1px] border-[#D9D9D9] w-fit my-4 rounded-lg px-3 py-1  flex justify-center flex-row items-center gap-1 ${
         hasPrevPage
-          ? 'bg-transparent hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0'
+          ? 'cursor-pointer bg-transparent hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0'
           : 'cursor-not-allowed opacity-50'
       }`}
         disabled={!hasPreviousPage}

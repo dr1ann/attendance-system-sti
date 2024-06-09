@@ -26,9 +26,26 @@ model User {
   yearLevel      String?
   role           UserRole @default(STUDENT)
   gender         String?
-  createdAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+  schedules      Schedule[] 
   @@index([role])
 }
+
+model Schedule {
+  id                String   @id @default(cuid())
+  studentId         String?
+  student           User?     @relation(fields: [studentId], references: [id])
+  teacherName       String?
+  scheduledDate     DateTime
+  scheduledInTime   String
+  scheduledOutTime  String
+  roomNum           String?
+  subject           String?
+  attendanceStatus  String?   @default("PENDING")
+  gender            String?
+  createdAt         DateTime @default(now())
+}
+
 
 
 

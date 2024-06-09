@@ -16,6 +16,7 @@ import { User } from "@prisma/client"
 import MoreInfo from "./MoreInfo"
 import PaginationControls from "./PaginationControls"
 import RemoveStudent from "./RemoveStudent"
+import ScheduleInfo from "./ScheduleInfo"
 
 //Images
 import studentassistants from '@/app/Images/studentassistant.png'
@@ -23,6 +24,8 @@ import maleProf from '@/app/Images/male-prof.png'
 import femaleProf from '@/app/Images/female-prof.png'
 import profile from '@/app/Images/profile.png'
 import nothinghere from '@/app/Images/nothinghere.jpg'
+import AddNewSchedule from "./AddNewSchedule"
+
 
 
 
@@ -32,13 +35,17 @@ export default function StudentAssistants({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  
+    const [isAddNewScheduleOpen, setIsAddNewScheduleOpen] = useState(false);
     const [isAddNewModalOpen, setIsAddNewModalOpen] = useState(false);
     const [isMoreInfoModalOpen, setIsMoreInfoModalOpen] = useState(false);
+    const [isScheduleInfoOpen, setIsScheduleInfoOpen] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [isFetchSuccessful, setIsFetchSuccessful] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [currentStudentId, setCurrentStudentId] = useState('');
+    const [currentStudentRefId, setCurrentStudentRefId] = useState('');
+    const [currentStudentName, setCurrentStudentName] = useState('');
+ 
     const [refetch, setRefetch] = useState<boolean>(false);
     const [sortOption, setSortOption] = useState<'name' | 'newest' | 'oldest'>('name');
     const [sortedStudents, setSortedStudents] = useState<User[]>([]);
@@ -203,6 +210,7 @@ export default function StudentAssistants({
     
 
 
+
       if (isLoading) {
         return (
          <PageLoader/>
@@ -227,8 +235,22 @@ export default function StudentAssistants({
     setIsMoreInfoModalOpen(true);
   };
    
-   
+  const handleAddNewScheduleClick = (e:React.MouseEvent<HTMLButtonElement>, studentId: string, studentName: string) => {
+    e.preventDefault();
+    setCurrentStudentId(studentId);
+    
+    setCurrentStudentName(studentName);
 
+    setIsAddNewScheduleOpen(true);
+  };
+  const handleScheduleInfoClick = (e:React.MouseEvent<HTMLButtonElement>, studentId: string, studentName: string) => {
+    e.preventDefault();
+    setCurrentStudentId(studentId);
+    
+    setCurrentStudentName(studentName);
+
+    setIsScheduleInfoOpen(true);
+  };
   return (
     <>
       {isAdmin ? (
@@ -452,13 +474,21 @@ export default function StudentAssistants({
                      </th>
   
               <td className="bg-gray-100 text-center  h-full shadow drop-shadow px-4 py-2 text-base">
-                  <button className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto  rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
+              <div className="flex flex-row items-center justify-center gap-3">
+            
+               
+                  <button  onClick={(e) => handleScheduleInfoClick(e, student?.id, student?.name)} className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto  rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
                       <i className="fa-solid fa-calendar-days text-center text-xs text-[#2C384A]"></i>
                       <span className="font-semibold text-sm text-center">View Schedules</span>
-                    
-               
-                
              </button>
+
+             <button  onClick={(e) => handleAddNewScheduleClick(e, student?.id, student?.name)} className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
+                      <i className="fa-solid  fa-calendar-plus text-center text-xs text-[#2C384A]"></i>
+                     
+             </button>
+             </div>
+           
+             
               </td>
               <td className="bg-gray-100  h-full shadow drop-shadow px-4 py-2">
                   <button id="showActivity" className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto  rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
@@ -519,6 +549,8 @@ export default function StudentAssistants({
           </div>
           <AddNewStudent setRefetch={() => setRefetch(true)} isVisible={isAddNewModalOpen} onClose={() => setIsAddNewModalOpen(false)} />
           <MoreInfo setRefetch={() => setRefetch(true)} currentId={currentStudentId} isVisible={isMoreInfoModalOpen} onClose={() => setIsMoreInfoModalOpen(false)} />
+          <ScheduleInfo setRefetch={() => setRefetch(true)} studentId={currentStudentId} studentName={currentStudentName} isVisible={isScheduleInfoOpen} onClose={() => setIsScheduleInfoOpen(false)} />
+          <AddNewSchedule studentId={currentStudentId} studentName={currentStudentName}  setRefetch={() => setRefetch(true)} isVisible={isAddNewScheduleOpen} onClose={() => setIsAddNewScheduleOpen(false)} />
           <Footer />
         </div>
       ) : (
