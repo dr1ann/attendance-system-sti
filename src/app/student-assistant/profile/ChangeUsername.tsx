@@ -54,7 +54,7 @@ const ChangeUsername : React.FC<ModalProps> =  ({setRefetch, currentId, currentU
                 setTimeout(() => {
                     setIsSuccessful(false);
                   onClose();
-                }, 2500);
+                }, 1500);
                 setErrorMessage('')
             } else {
                 setErrorMessage(result?.error);

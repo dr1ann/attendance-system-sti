@@ -183,7 +183,7 @@ interface ModalProps {
              setTimeout(() => {
               setIsSuccessful(false);
               onClose()
-             }, 2500);
+             }, 1500);
             }
          else if (data?.message === 'STUDENT ID ALREADY TAKEN' ) {
             setError('')

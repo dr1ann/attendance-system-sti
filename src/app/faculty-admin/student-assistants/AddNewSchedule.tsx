@@ -188,7 +188,7 @@ interface ModalProps {
           setTimeout(() => {
             setIsSuccessful(false);
             onClose();
-          }, 2500);
+          }, 1500);
         } else {
           setError('Something went wrong. Please try again');
           throw new Error('Failed to add schedule');

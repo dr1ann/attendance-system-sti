@@ -69,3 +69,35 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { id }: { id: string } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ message: 'SCHEDULE ID IS REQUIRED' }, { status: 400 });
+    }
+
+    // Check if the schedule exists
+    const schedule = await prisma.schedule.findUnique({
+      where: {
+        id: id, // Use id to find the schedule
+      },
+    });
+
+    if (!schedule) {
+      return NextResponse.json({ message: 'SCHEDULE NOT FOUND' }, { status: 404 });
+    }
+
+    // Delete the schedule
+    await prisma.schedule.delete({
+      where: { id: id },
+    });
+
+    // Return success message
+    return NextResponse.json({ message: 'Schedule deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting schedule:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

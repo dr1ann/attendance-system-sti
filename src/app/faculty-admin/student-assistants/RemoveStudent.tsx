@@ -30,7 +30,7 @@ const RemoveStudent: React.FC<ModalProps> = ({ id, setRefetch }) => {
   const [removeError, setIsremoveError] = useState('');
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); 
-  const [key, setKey] = useState(Math.random()); // Add this line
+  const [key, setKey] = useState(Math.random()); 
 
   const removeStudent = async () => {
 
@@ -70,7 +70,7 @@ const RemoveStudent: React.FC<ModalProps> = ({ id, setRefetch }) => {
         setTimeout(() => {
           setIsModalOpen(false); // PUT DELAY ON CLOSING THE MODAL
         }, 1000)
-      }, 2500);
+      }, 1500);
       
     }
   };

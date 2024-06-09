@@ -187,7 +187,7 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
             setTimeout(() => {
              setIsSuccessful(false);
              onClose()
-            }, 2500);
+            }, 1500);
           }
         
         } catch (error) {
@@ -247,7 +247,7 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
       };
       const handleDiscardCLick = (e:React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
-
+        resetErrorStates()
         setStudentInfo(originalStudentInfo); // Reset to the original state
         setIsEditMode(false);
       };

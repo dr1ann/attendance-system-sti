@@ -13,6 +13,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/app/components/shadcn/alert-dialog"
+import RemoveSchedule from './RemoveSchedule';
+import RemoveSchedulesByDate from './RemoveSchedulesByDate';
 
 
 interface ModalProps {
@@ -41,21 +43,18 @@ const [isEditMode, setIsEditMode] = useState(false);
     const [error, setError] = useState('')
     const [isFetchSuccessful, setIsFetchSuccessful] = useState(false);
     const [isSavePressed, setIsSavePressed] = useState(false)
-    const [isSuccessful, setIsSuccessful] = useState(false);
+    const [isUpdateSuccessful, setIsUpdateSuccessful] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [editingRowId, setEditingRowId] = useState<string | null>(null);
     
       // Validation states
       const [isTeacherNameEmpty, setIsTeacherNameEmpty] = useState(false);
-      const [isScheduledDateEmpty, setIsScheduledDateEmpty] = useState(false);
       const [isScheduledInTimeEmpty, setIsScheduledInTimeEmpty] = useState(false);
       const [isScheduledOutTimeEmpty, setIsScheduledOutTimeEmpty] = useState(false);
       const [isRoomNumEmpty, setIsRoomNumEmpty] = useState(false);
       const [isSubjectEmpty, setIsSubjectEmpty] = useState(false);
-      
-      const [isTeacherGenderEmpty, setIsTeacherGenderEmpty] = useState(false);
-      const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
-      const [editingRowId, setEditingRowId] = useState<String | null>(null);
-      
+      // const [refetch, setIsisRefetch] = useState(false);
+     
       const [editValues, setEditValues] = useState({
         teacherName: '',
         gender: '',
@@ -65,8 +64,11 @@ const [isEditMode, setIsEditMode] = useState(false);
         roomNum: '',
        
       });
+      
     
-      const handleEditClick = (rowId: string, schedule : Schedule) => {
+      
+      const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>, rowId: string, schedule : Schedule) => {
+        e.preventDefault()
         setEditingRowId(rowId);
         setEditValues({
           teacherName: schedule.teacherName || '',
@@ -89,9 +91,7 @@ const [isEditMode, setIsEditMode] = useState(false);
             case 'teacherName':
                 setIsTeacherNameEmpty(!value.trim());
                 break;
-            case 'gender':
-                setIsTeacherGenderEmpty(!value.trim());
-                break;
+           
             case 'subject':
                 setIsSubjectEmpty(!value.trim());
                 break;
@@ -111,41 +111,66 @@ const [isEditMode, setIsEditMode] = useState(false);
     };
     
     
-      const updateStudentSchedule = async () => {
-        try {
-          setIsSavePressed(true)
-          const response = await fetch('/api/schedule-info', {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: editingRowId, updatedSchedule: editValues })
-          });
+    const updateStudentSchedule = async () => {
+      try {
+        setIsSavePressed(true);
     
-          if (response.ok) {
-            setRefetch()
-            const updatedSchedule = await response.json();
-            const updatedSchedules = studentSchedule.map(schedule =>
-              schedule.id === editingRowId ? updatedSchedule : schedule
-            );
-            setIsSuccessful(true)
-              // Hide the prompt after 2.5 seconds
-              setTimeout(() => {
-                setIsSuccessful(false);
-               
-               }, 1000);
-            resetErrorStates();
-            setStudentSchedule(updatedSchedules);
-            setEditingRowId(null);
-          } else {
-            console.error('Failed to update schedule');
-          }
-        } catch (error) {
-          console.error('Error updating schedule:', error);
-        } finally {
-          setIsSavePressed(false)
+        // Check if there are changes
+    const originalSchedule = originalStudentSchedule.find(schedule => schedule.id === editingRowId);
+    if (!originalSchedule) {
+      console.error('Original schedule not found.');
+      return;
+    }
+
+    const hasChanges = (editValues: Partial<Schedule>, originalSchedule: Schedule): boolean => {
+      return Object.keys(editValues).some((key) => {
+        const scheduleKey = key as keyof Schedule;
+        return editValues[scheduleKey] !== originalSchedule[scheduleKey];
+      });
+    };
+
+    if (!hasChanges(editValues, originalSchedule)) {
+      setError('No changes were made');
+      return;
+    }
+
+    
+        const response = await fetch('/api/schedule-info', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: editingRowId, updatedSchedule: editValues })
+        });
+    
+        if (response.ok) {
+          const updatedSchedule = await response.json();
+          const updatedSchedules = studentSchedule.map(schedule =>
+            schedule.id === editingRowId ? updatedSchedule : schedule
+          );
+          setStudentSchedule(updatedSchedules);
+           resetErrorStates();
+          setEditingRowId(null);
+          setRefetch(); // Triggers the useEffect to refetch data
+          setIsUpdateSuccessful(true);
+    
+          // Hide the prompt after 2.5 seconds
+          setTimeout(() => {
+            setIsUpdateSuccessful(false);
+          }, 1000);
+    
+         
+        } else {
+          setError('Failed to update schedule');
+          console.error('Failed to update schedule');
         }
-      };
+      } catch (error) {
+        setError('Something went wrong');
+        console.error('Error updating schedule:', error);
+      } finally {
+        setIsSavePressed(false);
+      }
+    };
     
 
       const handleSaveChanges = ((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -157,10 +182,7 @@ const [isEditMode, setIsEditMode] = useState(false);
             isValid = false;
         } 
     
-        if (!editValues.gender.trim()) {
-          setIsTeacherGenderEmpty(true);
-            isValid = false;
-        } 
+       
     
         if (!editValues.subject.trim()) {
             setIsSubjectEmpty(true);
@@ -190,7 +212,9 @@ const [isEditMode, setIsEditMode] = useState(false);
       })
 
       // Function to handle discard button click
-      const handleDiscardChanges = () => {
+      const handleDiscardChanges = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        resetErrorStates()
         setEditingRowId(null);
       };
 
@@ -198,12 +222,13 @@ const [isEditMode, setIsEditMode] = useState(false);
 
   const resetErrorStates = () => {
     setIsTeacherNameEmpty(false);
-    setIsScheduledDateEmpty(false);
+   
     setIsScheduledInTimeEmpty(false);
     setIsScheduledOutTimeEmpty(false);
     setIsRoomNumEmpty(false);
     setIsSubjectEmpty(false);
-    setIsTeacherGenderEmpty(false);
+   
+    setError('')
   };
 
 
@@ -278,7 +303,7 @@ const latestDate = data.reduce((latest: Date, schedule: Schedule) => {
       
 
 
-  const formatDate = (dateString: string | Date) => {
+  const formatDate = (dateString: string | Date | null) => {
     return moment.utc(dateString).format('DD/MM/YYYY');
 };
   
@@ -307,7 +332,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
   return (
     <div data-modal-backdrop="add" aria-hidden="true" className="flex animate-fadeUp z-50 min-h-screen backdrop-blur-sm m-auto overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 bottom-0 justify-center items-center w-full md:inset-0 max-h-full">
 
-{!isSuccessful
+{!isUpdateSuccessful
 
 ?
  
@@ -344,53 +369,13 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
         <div className='flex flex-col gap-4 p-6'>
            {studentSchedule?.length > 0 && filteredSchedules?.length > 0 ? (
             <>
-          <div className="block lg:flex flex-row items-center justify-center gap-6">
-            <div className={`rounded-lg relative w-full mb-4 lg:mb-0`}>
-      <div className="relative ">
-<select onChange={(e) => handleDateChange(e)}
-    name="date"
-      id="date"
-  className={`text-sm lg:text-base block py-2 px-3 w-full text-black bg-transparent rounded-lg border-[1px]  focus:border-[#01579B] appearance-none focus:outline-none focus:ring-0 peer`}
-    
-    >
-  {uniqueDates.map((dateString, index) => (
-    <option key={index} value={dateString}>
-      {dateString}
-    </option>
-  ))}
-</select>
-<div className="absolute inset-y-0 right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-      <svg
-        className="w-5 h-5 text-gray-500"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path
-          fillRule="evenodd"
-          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </div>
-    </div>
-    <label
-      htmlFor="date"
-      className={`
-       text-[#888] peer-focus:text-[#01579B]
-      bg-white rounded-full tracking-wide text-nowrap absolute text-xs lg:text-sm duration-150 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-[0.625rem] peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1`}
-    >
-      Select Date (dd/mm/year)
-    </label>
-    </div>
-    <button 
-                  className={`bg-transparent text-nowrap border-[1px] border-[#ff0000] border-dashed hover:bg-[#ff0000] hover:text-white  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit ml-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1`}
-                >
-                  <i className={`fa-solid text-xs font-semibold fa-calendar-minus text-[#2C384A]'}`}></i>
-                  <span className='text-xs lg:text-sm font-semibold'>Remove Date</span>
-                </button>
-    </div>
+        <RemoveSchedulesByDate 
+    selectedDate={selectedDate}
+    setRefetch={setRefetch}
+    handleDateChange={handleDateChange}
+    formatDate={formatDate}
+    uniqueDates={uniqueDates}
+/>
     <div className="overflow-auto">
  
     <table className="table-auto rounded-lg w-fit mx-auto text-black text-left rtl:text-right">
@@ -408,7 +393,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
       <tbody>
         {filteredSchedules.map((schedule) => (
           <tr key={schedule.id}>
-            <td className={`bg-${editingRowId === schedule.id ? 'white' : 'gray-100'} px-4 py-2 shadow drop-shadow text-center `}>
+            <td className={`bg-${editingRowId === schedule.id ? 'white' : 'gray-100'} w-[50%] px-4 py-2 shadow drop-shadow text-center `}>
               {editingRowId === schedule.id ? (
                <>
                <input
@@ -417,7 +402,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
                   name="teacherName"
                   value={editValues.teacherName}
                   onChange={handleInputChange}
-                className={`w-full px-2 py-1 border-[1px] rounded-lg 
+                className={`min-w-[14rem] w-full px-2 py-1 border-[1px] rounded-lg 
               ${isTeacherNameEmpty ? 'border-[#ff0000] focus:border-[#ff0000]' : 'focus:border-[#01579B]'} appearance-none focus:outline-none focus:ring-0 peer`}
                 />
 
@@ -441,7 +426,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
                 name="gender"
                 id="gender"
                 autoComplete="off"
-               className="w-full px-2 py-1 border-[1px] rounded-lg 
+               className="min-w-[10rem] w-full px-2 py-1 border-[1px] rounded-lg 
               focus:border-[#01579B] appearance-none focus:outline-none focus:ring-0 peer"
               >
                 <option value="" disabled>
@@ -472,7 +457,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
                 schedule.gender || 'N/A'
               )}
             </td>
-            <td className={`bg-${editingRowId === schedule.id ? 'white' : 'gray-100'} px-4 py-2 shadow drop-shadow text-center`}>
+            <td className={`bg-${editingRowId === schedule.id ? 'white' : 'gray-100'} w-[25%] px-4 py-2 shadow drop-shadow text-center`}>
               {editingRowId === schedule.id ? (
                  <>
                  <input
@@ -481,7 +466,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
                     name="subject"
                     value={editValues.subject}
                     onChange={handleInputChange}
-                  className={`w-full px-2 py-1 border-[1px] rounded-lg 
+                  className={`min-w-[13rem] w-full px-2 py-1 border-[1px] rounded-lg 
                 ${isSubjectEmpty ? 'border-[#ff0000] focus:border-[#ff0000]' : 'focus:border-[#01579B]'} appearance-none focus:outline-none focus:ring-0 peer`}
                   />
   
@@ -542,7 +527,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
                 `${formatTime(schedule.scheduledInTime)} - ${formatTime(schedule.scheduledOutTime)}` || 'N/A'
               )}
             </td>
-            <td className={`bg-${editingRowId === schedule.id ? 'white' : 'gray-100'} px-4 py-2 shadow drop-shadow text-center`}>
+            <td className={`bg-${editingRowId === schedule.id ? 'white' : 'gray-100'} w-[25%] px-4 py-2 shadow drop-shadow text-center`}>
               {editingRowId === schedule.id ? (
                  <>
                  <input
@@ -551,7 +536,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
                     name="roomNum"
                     value={editValues.roomNum}
                     onChange={handleInputChange}
-                  className={`w-full px-2 py-1 border-[1px] rounded-lg 
+                  className={`min-w-[11rem] w-full px-2 py-1 border-[1px] rounded-lg 
                 ${isRoomNumEmpty ? 'border-[#ff0000] focus:border-[#ff0000]' : 'focus:border-[#01579B]'} appearance-none focus:outline-none focus:ring-0 peer`}
                   />
   
@@ -571,6 +556,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
               </td>
             <td className={`bg-${editingRowId === schedule.id ? 'white' : 'gray-100'} px-4 py-2 shadow drop-shadow text-center`}>
               {editingRowId === schedule.id ? (
+                <>
                 <div className="flex flex-row gap-4 items-center justify-center ">
                   {isSavePressed ?
                    <button
@@ -593,7 +579,7 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
                 }
                   
                   <AlertDialog>
-<AlertDialogTrigger className="bg-transparent border-[1px] border-[#ff0000] border-dashed hover:bg-[#ff0000] hover:text-white hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit ml-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1">
+<AlertDialogTrigger className="bg-transparent border-[1px] border-[#ff0000] border-dashed hover:bg-[#ff0000] hover:text-white hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit mx-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1">
 
 <i className="fa-solid text-xs font-semibold fa-trash "></i>
 <span className=" font-semibold text-xs lg:text-sm  text-center">Discard </span>
@@ -617,23 +603,31 @@ Yes
 
 </AlertDialogContent>
 </AlertDialog>
+
                 </div>
+                {error && 
+<div className="pt-2 flex flex-row items-center justify-center gap-1 text-[#ff0000]   ">
+<i className="fa-solid fa-circle-exclamation text-[13px]"></i>
+<p className="  text-[13px]">{error}</p>
+
+</div>
+}
+                </>
               ) : (
                 <div className="flex flex-row items-center justify-center gap-4">
                 <button
-                  onClick={() => handleEditClick(schedule.id, schedule)}
+                  onClick={(e) => handleEditClick(e, schedule.id, schedule)}
                   className={`bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit mx-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1`}
                 >
                   <i className={`fa-solid text-xs font-semibold fa-pen-to-square text-[#2C384A]'}`}></i>
                   <span className="text-xs lg:text-sm font-semibold">Edit</span>
                 </button>
 
-                  <button 
-                  className={`bg-transparent text-nowrap border-[1px] border-[#ff0000] border-dashed hover:bg-[#ff0000] hover:text-white  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit ml-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1`}
-                  >
-                  <i className={`fa-solid text-xs font-semibold fa-calendar-minus text-[#2C384A]'}`}></i>
-                  <span className='text-xs lg:text-sm font-semibold'>Remove </span>
-                  </button>
+                <RemoveSchedule
+          editingRowId={schedule?.id}
+          setRefetch={setRefetch}
+        />
+
                   </div>
               )}
             </td>

@@ -166,7 +166,7 @@ const ChangePassword : React.FC<ModalProps> =  ({setRefetch, currentId, isVisibl
                 setTimeout(() => {
                     setIsSuccessful(false);
                     onClose();
-                }, 2500);
+                }, 1500);
                 setErrorMessage('');
                 setCurrentPassErrorMessage('');
                 setConfNewPassErrorMessage('');

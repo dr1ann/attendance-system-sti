@@ -326,13 +326,19 @@ export default function StudentAssistants({
                  </div>
                  
                       </div>
-                      <div className="flex gap-6 flex-row flex-wrap mt-5 items-center">
-                      <button className=" bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
-                          <i className="fa-solid fa-calendar-days text-center text-xs text-[#2C384A]"></i>
-                          <span className="font-semibold text-sm text-center ">Schedules</span>
+                      <div className="flex gap-2 flex-row flex-wrap mt-5 items-center">
+                        
+                      <button  onClick={(e) => handleAddNewScheduleClick(e, student?.id, student?.name)} className=" bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
+                          <i className="fa-solid fa-calendar-plus text-center text-xs text-[#2C384A]"></i>
+                          
                       
                  </button>
-                 <button  className=" bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
+                      <button onClick={(e) => handleScheduleInfoClick(e, student?.id, student?.name)} className=" bg-transparent  border-[1px] border-[#D9D9D9] mr-4  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
+                          <i className="fa-solid fa-calendar-days text-center text-xs text-[#2C384A]"></i>
+                          <span className="font-semibold text-sm text-center ">View Schedules</span>
+                      
+                 </button>
+                 <button  className=" bg-transparent  border-[1px] border-[#D9D9D9] ml-auto  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
                   <i className="fa-solid fa-chart-line text-xs text-center text-[#2C384A]"></i>
                   <span className="font-semibold text-sm text-center">Activity Log</span>
               
