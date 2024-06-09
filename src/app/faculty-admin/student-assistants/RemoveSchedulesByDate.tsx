@@ -88,7 +88,7 @@ const RemoveSchedulesByDate: React.FC<ModalProps> = ({  selectedDate, setRefetch
   return (
     <>
        <div className="block lg:flex flex-row items-center justify-center gap-6">
-            <div className={`rounded-lg relative w-full mb-4 lg:mb-0`}>
+            <div className={`rounded-lg relative w-full lg:w-[80%] mb-4 lg:mb-0`}>
       <div className="relative ">
 <select onChange={(e) => handleDateChange(e)}
     name="date"
@@ -129,9 +129,9 @@ const RemoveSchedulesByDate: React.FC<ModalProps> = ({  selectedDate, setRefetch
     </label>
     </div>
     <AlertDialog key={key}>
-          <AlertDialogTrigger onClick={() => setIsModalOpen(true)} className="shadow  bg-transparent  border-[1px] border-[#ff0000] border-dashed hover:text-white hover:bg-[#ff0000]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto  rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1">
+          <AlertDialogTrigger onClick={() => setIsModalOpen(true)} className="shadow  bg-transparent  border-[1px] border-[#ff0000] border-dashed hover:text-white hover:bg-[#ff0000]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit ml-auto  rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1">
             <i className="fa-solid fa-calendar-minus text-xs text-center "></i>
-            <span className="font-semibold text-sm text-center">Remove</span>
+            <span className="font-semibold text-sm text-center">Remove Date</span>
           </AlertDialogTrigger>
           {isModalOpen &&
           <AlertDialogContent>
