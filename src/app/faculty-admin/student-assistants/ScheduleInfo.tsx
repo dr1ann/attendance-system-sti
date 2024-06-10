@@ -2,6 +2,7 @@ import PageLoader from '@/app/components/PageLoader';
 import { Schedule, User } from '@prisma/client';
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import moment from 'moment';
+import 'moment/locale/en-gb';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -254,23 +255,32 @@ const [isEditMode, setIsEditMode] = useState(false);
         setOriginalStudentSchedule(data);
         setStudentSchedule(data);
         setIsFetchSuccessful(true);
+        let currentDate: Date = moment().startOf('day').toDate(); // Current date
+        let nearestDate: Date | null = null; // Nearest upcoming date
         
-      // Find the latest date
-const latestDate = data.reduce((latest: Date, schedule: Schedule) => {
-    const scheduleDate = moment.utc(schedule.scheduledDate).toDate();
-    return scheduleDate > latest ? scheduleDate : latest;
-  }, new Date(0)); // Start with the earliest possible date
-  
-  setSelectedDate(latestDate); // Set the latest date as the default selected date
-  
-  const defaultFilteredSchedules = data.filter((schedule: Schedule) => {
-    const scheduleDate = moment.utc(schedule.scheduledDate).startOf('day');
-    const latestDateMoment = moment.utc(latestDate).startOf('day');
-  
-    return scheduleDate.isSame(latestDateMoment, 'day');
-  });
-  
-  setFilteredSchedules(defaultFilteredSchedules);
+        data.forEach(schedule => {
+          const scheduleDate: Date = moment(schedule.scheduledDate).startOf('day').toDate();
+          
+          if (!nearestDate && moment(scheduleDate).isAfter(currentDate, 'day')) {
+            nearestDate = scheduleDate; // Set nearestDate if found first upcoming date
+          } else if (nearestDate && moment(scheduleDate).isAfter(currentDate, 'day') && moment(scheduleDate).isBefore(nearestDate, 'day')) {
+            nearestDate = scheduleDate; // Update nearestDate if we find a closer upcoming date
+          }
+        });
+        
+        // If no future date is found, default to today's date
+        if (!nearestDate) {
+          nearestDate = currentDate;
+        }
+        
+        setSelectedDate(nearestDate);
+
+        
+        const initialFilteredSchedules = data.filter((schedule) => {
+            const scheduleDate = moment(schedule.scheduledDate).startOf('day');
+            return scheduleDate.isSame(moment(nearestDate).startOf('day'), 'day');
+          });
+          setFilteredSchedules(initialFilteredSchedules);
   
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -282,49 +292,39 @@ const latestDate = data.reduce((latest: Date, schedule: Schedule) => {
   }, [studentId, setRefetch]);
   
   
-      
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedDateStr = e.target.value;
-    const selectedDate = moment.utc(selectedDateStr, 'DD/MM/YYYY');
-  
-    setSelectedDate(selectedDate.toDate()); // Update selected date
-  
-    const filteredSchedules = studentSchedule.filter((schedule) => {
-      const scheduleDate = moment.utc(schedule.scheduledDate).startOf('day');
-      
-      return scheduleDate.isSame(selectedDate, 'day');
-    });
-  
-    setFilteredSchedules(filteredSchedules);
-  };
-  
-    
-      
+        
 
 
   const formatDate = (dateString: string | Date | null) => {
-    return moment.utc(dateString).format('DD/MM/YYYY');
+    return moment(dateString).format('MM/DD/YYYY');
 };
   
-
-  
-
-
-const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDate(schedule.scheduledDate))))
-  .sort((a: string, b: string) => {
-    const dateA = moment.utc(a, 'DD/MM/YYYY').toDate();
-    const dateB = moment.utc(b, 'DD/MM/YYYY').toDate();
-    return dateB.getTime() - dateA.getTime();
-  });
-
-
 
   const formatTime = (timeString: string) => {
     return moment(timeString, 'HH:mm').format('hh:mm A');
   };
 
-      
+  const isDateWithSchedule = (date: string | Date) => {
+    return studentSchedule.some((schedule: Schedule) =>
+      moment(schedule.scheduledDate).isSame(moment(date), 'day')
+    );
+  };
+  
+  
+  // Handle date selection
+  const onSelectDate = (date: Date) => {
+    // Update selected date
+    setSelectedDate(date);
+    
+    // Filter schedules based on the selected date
+    const filteredSchedules = studentSchedule.filter((schedule) => {
+      const scheduleDate = moment(schedule.scheduledDate).startOf('day');
+      return scheduleDate.isSame(moment(date).startOf('day'), 'day');
+    });
+    
+    // Set filtered schedules
+    setFilteredSchedules(filteredSchedules);
+  };
     if(!isVisible) {
         return null
     }
@@ -372,9 +372,9 @@ const uniqueDates = Array.from(new Set(studentSchedule.map(schedule => formatDat
         <RemoveSchedulesByDate 
     selectedDate={selectedDate}
     setRefetch={setRefetch}
-    handleDateChange={handleDateChange}
+    onSelectDate={onSelectDate}
     formatDate={formatDate}
-    uniqueDates={uniqueDates}
+    isDateWithSchedule={isDateWithSchedule}
 />
     <div className="overflow-auto">
  

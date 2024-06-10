@@ -248,7 +248,7 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 )}
 </form>
 
-            <Link href="/" className="text-[#01579B] font-semibold mb-4 mx-auto text-sm">Forgot Password?</Link>
+<span  className="text-black font-semibold mb-4 mx-auto text-sm">Student Assistant? <Link className="font-bold text-[#01579B] underline" href='/'>Click here</Link></span>
           </div>
         </div>
       </div>

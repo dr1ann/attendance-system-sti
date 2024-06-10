@@ -14,12 +14,12 @@ export async function DELETE(req: NextRequest) {
       }
   
       // Format the date as dd/MM/YYYY
-      const formattedDate = moment.utc(scheduledDate, 'DD/MM/YYYY').format('DD/MM/YYYY');
+      const formattedDate = moment.utc(scheduledDate, 'MM/DD/YYYY').format('MM/DD/YYYY');
 
   
       // Get the start and end dates for the given day
-      const startDate = moment.utc(formattedDate, 'DD/MM/YYYY').startOf('day').toDate();
-      const endDate = moment.utc(formattedDate, 'DD/MM/YYYY').endOf('day').toDate();
+      const startDate = moment.utc(formattedDate, 'MM/DD/YYYY').startOf('day').toDate();
+      const endDate = moment.utc(formattedDate, 'MM/DD/YYYY').endOf('day').toDate();
   
       // Delete all schedules for the given date
       await prisma.schedule.deleteMany({
