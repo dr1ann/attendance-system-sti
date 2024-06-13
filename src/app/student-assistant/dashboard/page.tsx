@@ -18,13 +18,18 @@ import attendance from '@/app/Images/attendance.png'
 import notifications from '@/app/Images/notification.png'
 import profile from '@/app/Images/profile.png'
 import AccessDenied from '@/app/components/AccessDenied'
+import { Schedule, User } from '@prisma/client'
 
 
-
+const MAX_SCHEDULES = 6; // Maximum number of schedules to fetch
 
 const Dashboard = () => {
     const [isStudentAssistant, setIsStudentAssistant] = useState(false);
 const [isLoading, setIsLoading] = useState(true);
+const [isFetchSuccessful, setIsFetchSuccessful] = useState(false);
+const [userData, setUserData] = useState<User | null>(null);
+const [upcomingSchedules, setUpcomingSchedules] = useState<Schedule[]>([]);
+
 const router = useRouter();
 
 useEffect(() => {
@@ -55,6 +60,77 @@ const fetchData = async () => {
 
 fetchData();
 }, []);
+
+ // Fetch user profile data
+ useEffect(() => {
+  const fetchUserProfile = async () => {
+      try {
+          const response = await fetch('/api/current-user-profile', {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              credentials: 'include', // Include cookies in the request
+          });
+
+          if (!response.ok) {
+            setIsFetchSuccessful(false);
+              throw new Error(`HTTP error! Status: ${response.status}`);
+              
+          }
+
+          const data : User = await response.json();
+      
+          setUserData(data);
+          setIsFetchSuccessful(true);
+      } catch (error) {
+          console.error("Error fetching user profile:", error);
+          setIsFetchSuccessful(false);
+      }
+  };
+
+  fetchUserProfile();
+}, []);
+
+
+useEffect(() => {
+  const fetchUserSchedule = async () => {
+    try {
+      const response = await fetch('/api/schedule-info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies in the request
+        body: JSON.stringify({ studentId: userData?.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data : Schedule[] = await response.json();
+      
+      // Filter and limit the number of schedules
+      const upcoming = data.filter(schedule => new Date(schedule.scheduledDate) > new Date())
+      .slice(0, MAX_SCHEDULES);
+console.log(data)
+      
+      setUpcomingSchedules(upcoming);
+      setIsFetchSuccessful(true);
+    } catch (error) {
+      console.error("Error fetching user schedules:", error);
+      setIsFetchSuccessful(false);
+    }
+  };
+
+  fetchUserSchedule();
+}, []); // Dependency array to trigger fetch when userData changes
+
+console.log(upcomingSchedules)
+
+
+
 if (isLoading) {
 return (
   <PageLoader/>
@@ -67,11 +143,32 @@ return (
         <div className="flex flex-col min-h-screen">
         <header >
             <div className="flex flex-row justify-start gap-1 items-center shadow drop-shadow bg-[#01579B]">
-                <Image src={maleProf} className="w-24 p-4" alt="" />
+            {userData?.gender ? (
+  userData.gender === 'Male' ? (
+    <>
+      <Image src={maleProf} className="w-24 p-4" alt="" />
+    </>
+  ) : (
+    <>
+        <Image src={femaleProf} className="w-24 p-4" alt="" />
+    </>
+  )
+) : (
+  <>
+   <Image src={profile} className="w-24 p-4" alt="" />
+</>
+)}
+               
+               
+
+                {userData ?
                 <div className="flex flex-col items-start">
-                    <h1 className=" text-base lg:text-lg font-bold">James Denoy</h1>
+                    <Link className=" text-base lg:text-lg font-bold" href={'/student-assistant/profile'}>{userData?.name || 'N/A'}</Link>
                     <span className="text-xs  text-gray-100">STUD - A</span>
                 </div>
+                :
+                <span className='text-base lg:text-lg'>No User Data Available</span>
+                }
             </div>
           
         </header>

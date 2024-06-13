@@ -261,11 +261,15 @@ const [isEditMode, setIsEditMode] = useState(false);
         data.forEach(schedule => {
           const scheduleDate: Date = moment(schedule.scheduledDate).startOf('day').toDate();
           
-          if (!nearestDate && moment(scheduleDate).isAfter(currentDate, 'day')) {
+          if (moment(scheduleDate).isSame(currentDate, 'day')) {
+            nearestDate = scheduleDate;
+        }
+        // Otherwise, find the nearest upcoming date
+        else if (!nearestDate && moment(scheduleDate).isAfter(currentDate, 'day')) {
             nearestDate = scheduleDate; // Set nearestDate if found first upcoming date
-          } else if (nearestDate && moment(scheduleDate).isAfter(currentDate, 'day') && moment(scheduleDate).isBefore(nearestDate, 'day')) {
+        } else if (nearestDate && moment(scheduleDate).isAfter(currentDate, 'day') && moment(scheduleDate).isBefore(nearestDate, 'day')) {
             nearestDate = scheduleDate; // Update nearestDate if we find a closer upcoming date
-          }
+        }
         });
         
         // If no future date is found, default to today's date

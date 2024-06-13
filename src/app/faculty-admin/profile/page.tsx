@@ -177,7 +177,7 @@ useEffect(() => {
   )
 ) : (
   <>
-  <Image src={profile} className="mt-[-90px] h-32 w-32 lg:h-40 lg:w-40" alt="Female Profile" />
+  <Image src={profile} className="mt-[-90px] h-32 w-32 lg:h-40 lg:w-40" alt="No Profile" />
   <div className="flex flex-row items-center justify-center gap-1">
     
     <h3 className="text-sm lg:text-base">N/A </h3>

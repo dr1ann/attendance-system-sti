@@ -2,6 +2,17 @@
 //External Libraries
 import Image from "next/image"
 import moment from "moment"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/shadcn/alert-dialog"
 
 
 //Components
@@ -10,11 +21,13 @@ import Header from "@/app/components/Header"
 import Sidebar from "@/app/components/Sidebar"
 import PageLoader from "@/app/components/PageLoader"
 import AccessDenied from "@/app/components/AccessDenied"
-import { useEffect, useState } from "react"
-import { Schedule, User } from "@prisma/client"
+import { useEffect, useMemo, useState } from "react"
+import {  User } from "@prisma/client"
 import DatePicker from "react-datepicker";
 import CustomDateInput from "@/app/components/CustomDateInput";
 import 'react-datepicker/dist/react-datepicker.css';
+import SidePageLoader from "@/app/components/SidePageLoader";
+import UpdateAttendanceStatus from "./UpdateAttendanceStatus"
 
 //Images
 import attendance from '@/app/Images/attendance.png'
@@ -26,20 +39,38 @@ import absent from '@/app/Images/absent.png'
 import pending from '@/app/Images/pending.png'
 import calendar from '@/app/Images/calendar.png'
 import profile from '@/app/Images/profile.png'
-import SidePageLoader from "@/app/components/SidePageLoader";
+import unavailable from '@/app/Images/not-allowed.png'
+import nothinghere from '@/app/Images/nothinghere.jpg'
 
-
+interface Schedule {
+  id: string;
+  studentId: string | null;
+  teacherName: string | null;
+  scheduledDate: Date;
+  scheduledInTime: string;
+  scheduledOutTime: string;
+  roomNum: string | null;
+  subject: string | null;
+  attendanceStatus: string | null;
+  gender: string | null;
+  createdAt: Date;
+  canMark?: boolean; // New property to indicate if marking is allowed
+}
 
 
 const Attendance = () => {
     const [isStudent, setIsStudent] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [refetch, setRefetch] = useState<boolean>(false);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
     const [isFetchSuccessful, setIsFetchSuccessful] = useState(false);
     const [userData, setUserData] = useState<User | null>(null);
     const [userSchedules, setUserSchedules] = useState<Schedule[]>([]);
     const [filteredSchedules, setFilteredSchedules] = useState<Schedule[]>([]);
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | string | null>(null);
+    const [editingRowId, setEditingRowId] = useState<string | null>(null);
+    
+    
     useEffect(() => {
         const validateStudent = async () => {
             try {
@@ -126,25 +157,44 @@ const Attendance = () => {
                 setUserSchedules(data);
                 setRefetch(false)
                 setIsFetchSuccessful(true);
-                let currentDate: Date = moment().startOf('day').toDate(); // Current date
-                let nearestDate: Date | null = null; // Nearest upcoming date
+                let currentDate: Date = moment().startOf('day').toDate();
+                let nearestDate: Date | null = null;
                 
-                data.forEach(schedule => {
-                  const scheduleDate: Date = moment(schedule.scheduledDate).startOf('day').toDate();
+                data.map(schedule => {
+                    // Parse scheduleDate and scheduleDateTime
+                    const scheduleDate = moment(schedule.scheduledDate).startOf('day');
+                    const scheduleDateTime = moment(`${scheduleDate.format('YYYY-MM-DD')} ${schedule.scheduledInTime}`, 'YYYY-MM-DD HH:mm');
+                    const currentDateTime = moment();
+                
+                    // Check if current day matches schedule day
+                    if (scheduleDate.isSame(moment(), 'day')) {
+                        nearestDate = scheduleDate.toDate();
+                        if (currentDateTime.isSameOrAfter(scheduleDateTime)) {
+                            schedule.canMark = true;
+                        } else {
+                            schedule.canMark = false;
+                        }
+                    } else if (!nearestDate && scheduleDate.isAfter(moment(), 'day')) {
+                        nearestDate = scheduleDate.toDate();
+                    } else if (nearestDate && scheduleDate.isAfter(moment(), 'day') && scheduleDate.isBefore(nearestDate, 'day')) {
+                        nearestDate = scheduleDate.toDate();
+                    }
+                
                   
-                  if (!nearestDate && moment(scheduleDate).isAfter(currentDate, 'day')) {
-                    nearestDate = scheduleDate; // Set nearestDate if found first upcoming date
-                  } else if (nearestDate && moment(scheduleDate).isAfter(currentDate, 'day') && moment(scheduleDate).isBefore(nearestDate, 'day')) {
-                    nearestDate = scheduleDate; // Update nearestDate if we find a closer upcoming date
-                  }
+                
+                  
                 });
                 
-                // If no future date is found, default to today's date
+                // Default to today's date if no future date is found
                 if (!nearestDate) {
-                  nearestDate = currentDate;
+                    nearestDate = currentDate;
                 }
                 
                 setSelectedDate(nearestDate);
+
+                // Create a moment object for the scheduled time today
+   
+    
 
 const initialFilteredSchedules = data.filter((schedule) => {
   const scheduleDate = moment(schedule.scheduledDate).startOf('day');
@@ -164,42 +214,10 @@ setFilteredSchedules(initialFilteredSchedules);
     
         fetchUserSchedule();
       
-    }, [userData?.id]);
+    }, [userData?.id, refetch]);
 
 
-    useEffect(() => {
-        if(refetch) {
-        const fetchUserSchedule = async () => {
-            try {
-                const response = await fetch('/api/schedule-info', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include', // Include cookies in the request
-                    body: JSON.stringify({ studentId: userData?.id }),
-                });
-    
-                if (!response.ok) {
-                  setIsFetchSuccessful(false);
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                    
-                }
-                
-                const data : Schedule[] = await response.json();
-              
-                setUserSchedules(data);
-                setRefetch(false)
-                setIsFetchSuccessful(true);
-            } catch (error) {
-                console.error("Error fetching user schedules:", error);
-                setIsFetchSuccessful(false);
-            }
-        };
-    
-        fetchUserSchedule();
-      }
-    }, [refetch]);
+   
 
     const formatTime = (timeString: string) => {
         return moment(timeString, 'HH:mm').format('hh:mm A');
@@ -238,6 +256,35 @@ const isDateWithSchedule = (date: string | Date) => {
     setFilteredSchedules(filteredSchedules);
   };
       
+ // Memoized sorting function to sort by the latest scheduledInTime and scheduledOutTime
+  const sortLatestInOutTimes = useMemo(() => {
+    return [...filteredSchedules].sort((a, b) => {
+      const scheduledInTimeA = new Date(`1970-01-01T${a.scheduledInTime}:00Z`).getTime();
+      const scheduledInTimeB = new Date(`1970-01-01T${b.scheduledInTime}:00Z`).getTime();
+      const scheduledOutTimeA = new Date(`1970-01-01T${a.scheduledOutTime}:00Z`).getTime();
+      const scheduledOutTimeB = new Date(`1970-01-01T${b.scheduledOutTime}:00Z`).getTime();
+
+      // First compare by scheduledInTime, then by scheduledOutTime
+      if (scheduledInTimeB !== scheduledInTimeA) {
+        return scheduledInTimeA - scheduledInTimeB;
+      }
+      return scheduledOutTimeA - scheduledOutTimeB;
+    });
+  }, [filteredSchedules]);
+
+
+  
+  const handleMarkClick = (e:React.MouseEvent<HTMLButtonElement>, scheduleId: string) => {
+    e.preventDefault()
+    setEditingRowId(scheduleId);
+    setIsUpdatingStatus(true);
+};
+
+const handleCancelOperation = (e: React.MouseEvent<HTMLButtonElement>) => {
+  e.preventDefault()
+  
+  setEditingRowId(null);
+};
 
     if (isLoading) {
         return (
@@ -255,7 +302,8 @@ const isDateWithSchedule = (date: string | Date) => {
               <div id="container" className="p-4 lg:ml-64 min-h-screen animate-fadeUp">
                 {isFetchSuccessful ? (
                   <>
-                    {userSchedules?.length > 0 ? (
+                    {userSchedules?.length > 0 && sortLatestInOutTimes?.length > 0 ? (
+                      <> 
                       <div className="p-0 lg:p-4 overflow-y-auto mt-[3em] lg:mt-[4em] rounded-lg">
                         <div
                           style={{ border: '1px solid #D9D9D9' }}
@@ -282,7 +330,7 @@ const isDateWithSchedule = (date: string | Date) => {
                           </ul>
                         </div>
                       </div>
-                    ) : null}
+                    
       
                     <div className="lg:hidden">
                     <DatePicker
@@ -293,8 +341,8 @@ const isDateWithSchedule = (date: string | Date) => {
                 
                 />
                       <ul className="mt-6 grid grid-cols-1 relative gap-6">
-                      {userSchedules?.map((schedule:Schedule, index:number) => (
-                        <li key={index}
+                      {sortLatestInOutTimes?.map((schedule:Schedule) => (
+                        <li key={schedule?.id}
                           style={{ border: '1px solid #D9D9D9' }}
                           className="flex flex-wrap flex-col items-start gap-3 p-3 rounded-lg shadow drop-shadow"
                         >
@@ -325,21 +373,66 @@ const isDateWithSchedule = (date: string | Date) => {
                               <span className="text-xs font-semibold">Out: {formatTime(schedule?.scheduledOutTime) || 'N/A'}</span>
                             </div>
                             <span className="text-sm mt-4 font-semibold">{schedule?.roomNum || 'N/A'} ({schedule?.subject || 'N/A'})</span>
-                            <button
-                              id="editBtn"
-                              className="shadow bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 flex flex-row gap-1 items-center justify-start mt-4 w-fit px-2 py-1 rounded-lg"
-                            >
-                              <i className="fa-solid fa-pen-to-square text-xs text-[#2C384A]"></i>
-                              <span className="text-sm font-semibold">Mark Attendance</span>
-                            </button>
-                            <div id="editContainer" className="hidden items-start flex-col gap-2 mt-4">
-                              <h3 className="attendance-indicator hide-indicator text-sm text-center font-semibold">Choose Attendance Color:</h3>
-                              <div className="flex flex-row gap-4 justify-center items-center">
-                                <Image id="present" src={present} className="attendance-indicator hide-indicator cursor-pointer w-8 h-auto" alt="present" />
-                                <Image id="late" src={late} className="attendance-indicator hide-indicator cursor-pointer w-8 h-auto" alt="late" />
-                                <Image id="absent" src={absent} className="attendance-indicator hide-indicator cursor-pointer w-8 h-auto" alt="absent" />
+                            {editingRowId === schedule.id ? 
+                              <div className="space-y-6">
+                              <UpdateAttendanceStatus
+                                currentAttendanceStatus={schedule?.attendanceStatus}
+                                  setRefetch={() => setRefetch(true)}
+                                  isVisible={editingRowId === schedule.id}
+                                  onClose={() => setEditingRowId(null)}
+                                  scheduleId={schedule.id}
+                                  teacherName={schedule?.teacherName}
+                              />
+
+                              <AlertDialog>
+                              <AlertDialogTrigger className="bg-transparent border-[1px] border-[#ff0000] border-dashed hover:bg-[#ff0000] hover:text-white hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit mr-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1">
+                              
+                              <i className="fa-solid text-xs font-semibold fa-xmark mt-[1px]"></i>
+                              <span className=" font-semibold text-xs lg:text-sm  text-center">Cancel </span>
+                              
+                              
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                              <AlertDialogHeader>
+                              <AlertDialogTitle>Cancel Operation</AlertDialogTitle>
+                              <AlertDialogDescription>
+                              Are you sure you want to cancel marking attendance?
+                              </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                              
+                              <AlertDialogCancel>No</AlertDialogCancel>
+                              <AlertDialogAction className="bg-[#2C384A]" onClick={handleCancelOperation} >
+                              Yes
+                              </AlertDialogAction>
+                              </AlertDialogFooter>
+                              
+                              </AlertDialogContent>
+                              </AlertDialog>
                               </div>
-                            </div>
+
+                              :
+                              <>
+                              {schedule?.canMark
+                              ?
+                              <button
+                              onClick={(e) => handleMarkClick(e, schedule?.id)}
+                                className="mt-3 shadow bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mr-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1"
+                              >
+                                <i className="fa-solid fa-pen-to-square text-xs  text-[#2C384A]"></i>
+                                <span className="font-semibold text-sm ">Mark Attendance</span>
+                              </button>
+                            :
+                            <div className="flex flex-row items-center gap-1 mt-4 justify-center">
+                           <Image src={unavailable} className="w-5 h-auto" alt="not-allowed" />
+
+
+                              <span className='text-center text-sm'>Unavailable to mark attendance</span>
+                              </div>
+                            }
+
+                              </>
+                          }
                           </div>
                         </li>
                         ))}
@@ -360,8 +453,8 @@ const isDateWithSchedule = (date: string | Date) => {
                             <button
                         className="shadow bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit ml-auto my-4 rounded-lg px-3 py-1 mr-2 cursor-pointer flex justify-center flex-row items-center gap-1"
                       >
-                        <i className="fa-solid fa-print text-base text-[#2C384A]"></i>
-                        <span id="showAdd" className="font-semibold text-base text-center">Print</span>
+                        <i className="fa-solid fa-print text-sm text-[#2C384A]"></i>
+                        <span id="showAdd" className="font-semibold text-sm text-center">Print</span>
                       </button>
                         </div>
                   
@@ -377,8 +470,8 @@ const isDateWithSchedule = (date: string | Date) => {
                           </tr>
                         </thead>
                         <tbody>
-                        {filteredSchedules?.map((schedule:Schedule, index:number) => (
-                          <tr key={index}>
+                        {sortLatestInOutTimes?.map((schedule:Schedule) => (
+                          <tr key={schedule?.id}>
                             <th scope="row" className="px-4 py-2 font-normal text-base bg-gray-100 h-full shadow drop-shadow">
                               <div className="flex flex-row gap-3 flex-wrap">
                                 <Image  src={schedule?.gender === 'Male' ? maleProf : (schedule?.gender === 'Female' ? femaleProf : profile)}
@@ -421,24 +514,90 @@ const isDateWithSchedule = (date: string | Date) => {
                               </div>
                             </td>
                             <td className="bg-gray-100 h-full shadow drop-shadow px-4 py-2">
+                              
+                              
+                            
+                          
+                            {editingRowId === schedule.id ? 
+                              <div className="space-y-6">
+                              <UpdateAttendanceStatus
+                                  currentAttendanceStatus={schedule?.attendanceStatus}
+                                  setRefetch={() => setRefetch(true)}
+                                  isVisible={editingRowId === schedule.id}
+                                  onClose={() => setEditingRowId(null)}
+                                  scheduleId={schedule.id}
+                                  teacherName={schedule?.teacherName}
+                              />
+
+                              <AlertDialog>
+                              <AlertDialogTrigger className="bg-transparent border-[1px] border-[#ff0000] border-dashed hover:bg-[#ff0000] hover:text-white hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit mx-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1">
+                              
+                              <i className="fa-solid text-xs lg:text-sm font-semibold fa-xmark "></i>
+                              <span className=" font-semibold text-xs lg:text-sm  text-center">Cancel </span>
+                              
+                              
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                              <AlertDialogHeader>
+                              <AlertDialogTitle>Cancel Operation</AlertDialogTitle>
+                              <AlertDialogDescription>
+                              Are you sure you want to cancel marking the attendance of teacher {schedule?.teacherName}?
+                              </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                              
+                              <AlertDialogCancel>No</AlertDialogCancel>
+                              <AlertDialogAction className="bg-[#2C384A]" onClick={handleCancelOperation} >
+                              Yes
+                              </AlertDialogAction>
+                              </AlertDialogFooter>
+                              
+                              </AlertDialogContent>
+                              </AlertDialog>
+                              </div>
+
+                              :
+                              <>
+                              {schedule?.canMark
+                              ?
+                              
                               <button
+                              onClick={(e) => handleMarkClick(e, schedule?.id)}
                                 className="shadow bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1"
                               >
-                                <i className="fa-solid fa-pen-to-square text-center text-[#2C384A]"></i>
-                                <span className="font-semibold text-center">Mark</span>
+                                <i className="fa-solid fa-pen-to-square text-sm text-center text-[#2C384A]"></i>
+                                <span className="font-semibold text-sm text-center">Mark</span>
                               </button>
-                              <div id="editContainer" className="hidden flex-wrap items-center flex-row justify-center gap-4">
-                                <h3 className="attendance-indicator hide-indicator text-sm text-center font-semibold">Choose Attendance Color:</h3>
-                                <Image id="present" src={present} className="attendance-indicator hide-indicator cursor-pointer w-8 h-auto" alt="present" />
-                                <Image id="late" src={late} className="attendance-indicator hide-indicator cursor-pointer w-8 h-auto" alt="late" />
-                                <Image id="absent" src={absent} className="attendance-indicator hide-indicator cursor-pointer w-8 h-auto" alt="absent" />
+                              :
+                              <div className="flex flex-row items-center gap-1 justify-center">
+                           <Image src={unavailable} className="w-5 h-auto" alt="not-allowed" />
+
+
+                              <span className='text-center text-sm'>Unavailable</span>
                               </div>
-                            </td>
+                            }
+                              </>
+                          }
+                           
+                            
+                           
+                             </td>
                           </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
+                    </>
+) : (
+  <div className="max-w-[2050px] mx-auto">
+    <div className='flex flex-col items-center justify-center min-h-screen'>
+     
+      <Image priority src={nothinghere} className='w-[20rem] lg:w-[28rem] h-auto' alt='access denied' />
+      {/* Button component for adding new student assistant */}
+      <span className="text-base lg:text-lg font-semibold">You currently don't have any schedule(s).</span>
+    </div>
+  </div>
+)}
                   </>
                 ) : (
                   <SidePageLoader />
