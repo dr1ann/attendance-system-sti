@@ -1,6 +1,6 @@
 import PageLoader from '@/app/components/PageLoader';
 import { Schedule, User } from '@prisma/client';
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import moment from 'moment';
 import 'moment/locale/en-gb';
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/app/components/shadcn/alert-dialog"
 import RemoveSchedule from './RemoveSchedule';
 import RemoveSchedulesByDate from './RemoveSchedulesByDate';
+import { ExportSchedule } from '@/app/components/ExportToExcel';
 
 
 interface ModalProps {
@@ -257,25 +258,27 @@ const [isEditMode, setIsEditMode] = useState(false);
         setIsFetchSuccessful(true);
         let currentDate: Date = moment().startOf('day').toDate(); // Current date
         let nearestDate: Date | null = null; // Nearest upcoming date
-        
+   
         data.forEach(schedule => {
           const scheduleDate: Date = moment(schedule.scheduledDate).startOf('day').toDate();
-          
+         
           if (moment(scheduleDate).isSame(currentDate, 'day')) {
             nearestDate = scheduleDate;
+           
         }
         // Otherwise, find the nearest upcoming date
         else if (!nearestDate && moment(scheduleDate).isAfter(currentDate, 'day')) {
             nearestDate = scheduleDate; // Set nearestDate if found first upcoming date
+        
         } else if (nearestDate && moment(scheduleDate).isAfter(currentDate, 'day') && moment(scheduleDate).isBefore(nearestDate, 'day')) {
             nearestDate = scheduleDate; // Update nearestDate if we find a closer upcoming date
+           
+        } else {
+          nearestDate = scheduleDate
         }
         });
         
-        // If no future date is found, default to today's date
-        if (!nearestDate) {
-          nearestDate = currentDate;
-        }
+       
         
         setSelectedDate(nearestDate);
 
@@ -314,7 +317,7 @@ const [isEditMode, setIsEditMode] = useState(false);
     );
   };
   
-  
+  console.log(selectedDate)
   // Handle date selection
   const onSelectDate = (date: Date) => {
     // Update selected date
@@ -329,6 +332,34 @@ const [isEditMode, setIsEditMode] = useState(false);
     // Set filtered schedules
     setFilteredSchedules(filteredSchedules);
   };
+
+   // Memoized sorting function to sort by the latest scheduledInTime and scheduledOutTime
+   const sortLatestInOutTimes = useMemo(() => {
+    return [...filteredSchedules].sort((a, b) => {
+      const scheduledInTimeA = new Date(`1970-01-01T${a.scheduledInTime}:00Z`).getTime();
+      const scheduledInTimeB = new Date(`1970-01-01T${b.scheduledInTime}:00Z`).getTime();
+      const scheduledOutTimeA = new Date(`1970-01-01T${a.scheduledOutTime}:00Z`).getTime();
+      const scheduledOutTimeB = new Date(`1970-01-01T${b.scheduledOutTime}:00Z`).getTime();
+
+      // First compare by scheduledInTime, then by scheduledOutTime
+      if (scheduledInTimeB !== scheduledInTimeA) {
+        return scheduledInTimeA - scheduledInTimeB;
+      }
+      return scheduledOutTimeA - scheduledOutTimeB;
+    });
+  }, [filteredSchedules]);
+  
+  const scheduledDate = moment(sortLatestInOutTimes[0]?.scheduledDate).format('YYYY-MM-DD'); // Extract and format the date
+
+const fileName = `Schedule_Report_${scheduledDate}`; // Append the date to the filename
+
+  const handleExport = () => {
+    ExportSchedule(sortLatestInOutTimes.map(schedule => ({
+      ...schedule,
+      studentName: schedule.studentName ?? null, // Ensure studentName is not undefined
+    })), fileName);
+  };
+  
     if(!isVisible) {
         return null
     }
@@ -371,8 +402,10 @@ const [isEditMode, setIsEditMode] = useState(false);
   :
       
         <div className='flex flex-col gap-4 p-6'>
-           {studentSchedule?.length > 0 && filteredSchedules?.length > 0 ? (
+           {studentSchedule?.length > 0 && sortLatestInOutTimes?.length > 0 ? (
             <>
+
+            <div className='block lg:flex flex-row justify-between gap-6 items-center'>
         <RemoveSchedulesByDate 
     selectedDate={selectedDate}
     setRefetch={setRefetch}
@@ -380,6 +413,15 @@ const [isEditMode, setIsEditMode] = useState(false);
     formatDate={formatDate}
     isDateWithSchedule={isDateWithSchedule}
 />
+<button
+                            onClick={handleExport}
+                        className="shadow bg-transparent mt-2 lg:mt-0 border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit ml-auto rounded-lg px-3 py-1 mr-2 cursor-pointer flex justify-center flex-row items-center gap-1"
+                      >
+                        <i className="fa-solid fa-print text-sm text-[#2C384A]"></i>
+                        <span id="showAdd" className="font-semibold text-sm text-center">Export Schedule</span>
+                      </button>
+</div>
+                
     <div className="overflow-auto">
  
     <table className="table-auto rounded-lg w-fit mx-auto text-black text-left rtl:text-right">

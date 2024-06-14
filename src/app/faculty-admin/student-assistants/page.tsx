@@ -25,6 +25,7 @@ import femaleProf from '@/app/Images/female-prof.png'
 import profile from '@/app/Images/profile.png'
 import nothinghere from '@/app/Images/noneplaceholder.png'
 import AddNewSchedule from "./AddNewSchedule"
+import ScheduleList from "./PrintAllSchedules"
 
 
 
@@ -295,11 +296,12 @@ export default function StudentAssistants({
                   <li key={index} style={{border: "1px solid #D9D9D9"}} className="flex flex-wrap flex-col  gap-3 p-3 rounded-lg shadow drop-shadow">
               
                     <div className="flex flex-row justify-between items-center gap-8">
+                     
                       <Image src={student?.gender === 'Male' ? maleProf : student?.gender === 'Female' ? femaleProf : profile} className="flex w-16 px-2 h-auto"  alt="" />
       
                       <RemoveStudent   setRefetch={() =>  setRefetch(true)} id={student?.id}/>
+                    
                       </div>
-                      
                     <div className="flex flex-row space-x-2">
                       
                       <div className="flex flex-col ">
@@ -378,12 +380,7 @@ export default function StudentAssistants({
                       <span  className="font-semibold text-sm text-center">Info</span>
                   
               </li>
-              <li className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 cursor-pointer gap-1 flex items-center justify-center  p-2 rounded-lg ">
-                 
-                  <i className="fa-solid fa-calendar-days text-lg text-[#2C384A]"></i>
-                  <span  className="font-semibold text-sm text-center">Schedules</span>
-              
-          </li>
+              <ScheduleList />
           <li className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 cursor-pointer gap-1 flex items-center justify-center  p-2 rounded-lg ">
                  
               <i className="fa-solid fa-chart-line text-lg text-[#2C384A]"></i>

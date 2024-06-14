@@ -28,7 +28,7 @@ import CustomDateInput from "@/app/components/CustomDateInput";
 import 'react-datepicker/dist/react-datepicker.css';
 import SidePageLoader from "@/app/components/SidePageLoader";
 import UpdateAttendanceStatus from "./UpdateAttendanceStatus"
-
+import { ExportSchedule } from "@/app/components/ExportToExcel"
 //Images
 import attendance from '@/app/Images/attendance.png'
 import maleProf from '@/app/Images/male-prof.png'
@@ -41,6 +41,8 @@ import calendar from '@/app/Images/calendar.png'
 import profile from '@/app/Images/profile.png'
 import unavailable from '@/app/Images/not-allowed.png'
 import nothinghere from '@/app/Images/noneplaceholder.png'
+
+
 
 interface Schedule {
   id: string;
@@ -55,6 +57,7 @@ interface Schedule {
   gender: string | null;
   createdAt: Date;
   canMark?: boolean; // New property to indicate if marking is allowed
+  studentName?:string 
 }
 
 
@@ -178,6 +181,8 @@ const Attendance = () => {
                         nearestDate = scheduleDate.toDate();
                     } else if (nearestDate && scheduleDate.isAfter(moment(), 'day') && scheduleDate.isBefore(nearestDate, 'day')) {
                         nearestDate = scheduleDate.toDate();
+                    } else {
+                      nearestDate = scheduleDate.toDate();
                     }
                 
                   
@@ -185,10 +190,6 @@ const Attendance = () => {
                   
                 });
                 
-                // Default to today's date if no future date is found
-                if (!nearestDate) {
-                    nearestDate = currentDate;
-                }
                 
                 setSelectedDate(nearestDate);
 
@@ -285,6 +286,25 @@ const handleCancelOperation = (e: React.MouseEvent<HTMLButtonElement>) => {
   
   setEditingRowId(null);
 };
+
+
+
+
+
+
+const scheduledDate = moment(sortLatestInOutTimes[0]?.scheduledDate).format('YYYY-MM-DD'); // Extract and format the date
+
+const fileName = `Schedule_Report_${scheduledDate}`; // Append the date to the filename
+
+
+
+const handleExport = () => {
+  ExportSchedule(sortLatestInOutTimes.map(schedule => ({
+    ...schedule,
+    studentName: schedule.studentName ?? null, // Ensure studentName is not undefined
+  })), fileName);
+};
+
 
     if (isLoading) {
         return (
@@ -451,10 +471,11 @@ const handleCancelOperation = (e: React.MouseEvent<HTMLButtonElement>) => {
                 
                 />
                             <button
+                            onClick={handleExport}
                         className="shadow bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit ml-auto my-4 rounded-lg px-3 py-1 mr-2 cursor-pointer flex justify-center flex-row items-center gap-1"
                       >
                         <i className="fa-solid fa-print text-sm text-[#2C384A]"></i>
-                        <span id="showAdd" className="font-semibold text-sm text-center">Print</span>
+                        <span id="showAdd" className="font-semibold text-sm text-center">Export Schedule</span>
                       </button>
                         </div>
                   

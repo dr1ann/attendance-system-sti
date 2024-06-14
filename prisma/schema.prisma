@@ -44,6 +44,7 @@ model Schedule {
   attendanceStatus  String?   @default("PENDING")
   gender            String?
   createdAt         DateTime @default(now())
+  studentName       String?
 }
 
 

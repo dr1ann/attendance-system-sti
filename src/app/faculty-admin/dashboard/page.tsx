@@ -83,7 +83,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex  justify-between">
                         <h2 className="text-xl lg:text-2xl p-2 font-bold text-black">As of today</h2>
-                        <Link href="student-assistants.html" className="text-xs lg:text-sm font-bold text-[#01579B]">View more <i className="fa-solid fa-arrow-right text-xs"></i></Link>
+                        <Link href="/faculty-admin/student-assistants" className="text-xs lg:text-sm font-bold text-[#01579B]">View more <i className="fa-solid fa-arrow-right text-xs"></i></Link>
                     </div>
                     <table className="w-full text-left rtl:text-right">
                         <thead>

@@ -91,6 +91,7 @@ interface ModalProps {
         subject: newSchedule?.subject?.trim(),
         gender: newSchedule?.gender?.trim(),
         studentId: studentId,
+        studentName: studentName
       };
   
       // Combine date and time into DateTime string

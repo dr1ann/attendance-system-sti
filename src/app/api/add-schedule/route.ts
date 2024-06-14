@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const body: {
       studentId: string,
+      studentName: string,
       teacherName?: string,
       scheduledDate: Date,
       scheduledInTime: string,
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
 
     const {
       studentId,
+      studentName,
       teacherName,
       scheduledDate,
       scheduledInTime,
@@ -34,16 +36,18 @@ export async function POST(req: NextRequest) {
       where: {
         id: studentId,
       },
+      select: { name: true },
     });
 
     if (!student) {
       return NextResponse.json({ message: 'STUDENT NOT FOUND' }, { status: 404 });
     }
-console.log(studentId)
+   
     // Create the new schedule associated with the student
     const newSchedule = await prisma.schedule.create({
       data: {
-        studentId, // Associate the schedule with the student
+        studentId, 
+        studentName,
         teacherName,
         scheduledDate,
         scheduledInTime,
@@ -53,6 +57,7 @@ console.log(studentId)
         attendanceStatus,
         gender,
         createdAt: new Date(),
+        
       },
     });
 
