@@ -40,7 +40,7 @@ import pending from '@/app/Images/pending.png'
 import calendar from '@/app/Images/calendar.png'
 import profile from '@/app/Images/profile.png'
 import unavailable from '@/app/Images/not-allowed.png'
-import nothinghere from '@/app/Images/nothinghere.jpg'
+import nothinghere from '@/app/Images/noneplaceholder.png'
 
 interface Schedule {
   id: string;
@@ -592,9 +592,9 @@ const handleCancelOperation = (e: React.MouseEvent<HTMLButtonElement>) => {
   <div className="max-w-[2050px] mx-auto">
     <div className='flex flex-col items-center justify-center min-h-screen'>
      
-      <Image priority src={nothinghere} className='w-[20rem] lg:w-[28rem] h-auto' alt='access denied' />
+      <Image priority src={nothinghere} className='w-[20rem] lg:w-[28rem] h-auto' alt='nothing here' />
       {/* Button component for adding new student assistant */}
-      <span className="text-base lg:text-lg font-semibold">You currently don't have any schedule(s).</span>
+      <span className="text-lg lg:text-xl font-semibold">You currently don't have any schedule(s).</span>
     </div>
   </div>
 )}

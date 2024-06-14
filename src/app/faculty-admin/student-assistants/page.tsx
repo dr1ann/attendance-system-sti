@@ -23,7 +23,7 @@ import studentassistants from '@/app/Images/studentassistant.png'
 import maleProf from '@/app/Images/male-prof.png'
 import femaleProf from '@/app/Images/female-prof.png'
 import profile from '@/app/Images/profile.png'
-import nothinghere from '@/app/Images/nothinghere.jpg'
+import nothinghere from '@/app/Images/noneplaceholder.png'
 import AddNewSchedule from "./AddNewSchedule"
 
 
@@ -540,7 +540,7 @@ export default function StudentAssistants({
                     <div className='flex flex-col items-center justify-center min-h-screen'>
                       {/* Image component with priority prop */}
                       <Image priority src={nothinghere} className='w-[20rem] lg:w-[28rem] h-auto' alt='access denied' />
-                      {/* Button component for adding new student assistant */}
+                      <span className="mb-4 text-sm lg:text-base font-semibold">No student assistants registered at the moment.</span>
                       <button onClick={(e:React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); setIsAddNewModalOpen(true) } } className="shadow bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit my-4 rounded-lg px-3 py-1 mr-2 cursor-pointer flex justify-center flex-row items-center gap-1">
                         <i className="fa-solid fa-user-plus text-sm lg:text-base text-center text-[#2C384A]"></i>
                         <span className="font-semibold text-sm lg:text-base  text-center">Add New Student Assistant</span>

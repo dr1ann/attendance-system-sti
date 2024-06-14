@@ -5,10 +5,14 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BeatLoader } from 'react-spinners'
+import moment from 'moment'
+
 
 //Components
 import Footer from '@/app/components/Footer'
 import PageLoader from '@/app/components/PageLoader'
+import AccessDenied from '@/app/components/AccessDenied'
+import { Schedule, User } from '@prisma/client'
 
 //Images
 import maleProf from '@/app/Images/male-prof.png'
@@ -17,8 +21,7 @@ import dashboard from '@/app/Images/dashboard.png'
 import attendance from '@/app/Images/attendance.png'
 import notifications from '@/app/Images/notification.png'
 import profile from '@/app/Images/profile.png'
-import AccessDenied from '@/app/components/AccessDenied'
-import { Schedule, User } from '@prisma/client'
+import noneplaceholder from '@/app/Images/noneplaceholder.png'
 
 
 const MAX_SCHEDULES = 6; // Maximum number of schedules to fetch
@@ -125,11 +128,16 @@ console.log(data)
   };
 
   fetchUserSchedule();
-}, []); // Dependency array to trigger fetch when userData changes
+}, [userData?.id]);
 
 console.log(upcomingSchedules)
 
-
+const formatTime = (timeString: string) => {
+  return moment(timeString, 'HH:mm').format('hh:mm A');
+};
+const formatDate = (dateString: string | Date | null) => {
+  return moment(dateString).format('MM/DD/YYYY');
+};
 
 if (isLoading) {
 return (
@@ -174,18 +182,56 @@ return (
         </header>
         <div className="m-2 md:mb-6 md:mx-6">
         <div className="bg-white p-2 rounded-lg   shadow drop-shadow  max-w-[1000px]  mt-[-16px]  mx-auto">
-            <div className="flex flex-col  p-2 gap-4">
-                <div className="flex flex-row justify-center  items-center">
-                    <Image src={dashboard} className="w-14 lg:w-20 " alt="" />
-                    <p className="text-xl lg:text-2xl text-black font-bold pr-5">Dashboard</p>
-                </div>
-              
-                    <h2 className="text-xl lg:text-2xl p-2 font-bold text-black">Upcoming Schedules</h2>
-                  
-               
-                
-                
-            </div>
+        <div className="flex flex-col p-2 gap-4">
+  <div className={`flex flex-row ${upcomingSchedules?.length > 0 ? 'justify-center' : 'justify-start'} items-center`}>
+    <Image src={dashboard} className="w-14 lg:w-20" alt="" />
+    <p className="text-xl lg:text-2xl text-black font-bold pr-5">Dashboard</p>
+  </div>
+  
+  {upcomingSchedules?.length > 0 ? (
+    <>
+      <div className="flex justify-between">
+        <h2 className="text-xl lg:text-2xl p-2 font-bold text-black">Upcoming Schedules</h2>
+        <Link href="/student-assistant/attendance" className="text-xs lg:text-sm font-bold text-[#01579B]">
+          View more <i className="fa-solid fa-arrow-right text-xs"></i>
+        </Link>
+      </div>
+
+      <table className="w-full text-left rtl:text-right">
+        <thead>
+          <tr className="bg-[#2C384A]">
+            <th scope="col" id="activityHeader" className="text-center text-base lg:text-lg px-6 py-3">TEACHER</th>
+            <th scope="col" id="roomNumHeader" className="text-center text-base lg:text-lg px-6 py-3">ROOM NO.</th>
+            <th scope="col" id="dateTimeHeader" className="text-center text-base lg:text-lg px-6 py-3">Date & Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {upcomingSchedules?.map((schedule: Schedule) => (
+            <tr key={schedule?.id}>
+              <th scope="row" className="px-6 py-3 text-center text-sm font-semibold text-black lg:text-base bg-gray-100 h-full shadow drop-shadow">
+                {schedule?.teacherName}
+              </th>
+              <td className="px-6 py-3 text-center text-sm lg:text-base bg-gray-100 text-black h-full shadow drop-shadow">
+                {schedule?.roomNum}
+              </td>
+              <td className="px-6 py-3 text-center text-sm lg:text-base bg-gray-100 text-black h-full shadow drop-shadow">
+                {formatDate(schedule?.scheduledDate)}
+                <br />
+                ({formatTime(schedule?.scheduledInTime)} - {formatTime(schedule?.scheduledOutTime)})
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  ) : (
+    <div className="flex flex-col gap-3 items-center justify-center mb-4">
+       <Image priority src={noneplaceholder} className='w-[12rem] lg:w-[20rem] h-auto' alt='nothing here' />
+    <p className='text-center text-black text-xl lg:text-2xl font-semibold'>No upcoming schedules</p>
+    </div>
+  )}
+</div>
+  
         </div>
     
          
