@@ -607,7 +607,7 @@ const fileName = `Schedule_Report_${scheduledDate}`; // Append the date to the f
                   {isSavePressed ?
                    <button
                    disabled={isSavePressed}
-                   className={`bg-transparent border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent hover:text-white transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit ml-auto rounded-lg px-2 py-1 cursor-pointer flex justify-center flex-row items-center gap-1`}
+                   className={`bg-transparent border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent hover:text-white transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow w-fit ml-auto rounded-lg px-2 py-1 cursor-not-allowed flex justify-center flex-row items-center gap-1`}
                  >
                   <span className='sr-only'>Loading...</span>
 

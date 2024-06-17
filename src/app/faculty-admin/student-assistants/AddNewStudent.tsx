@@ -618,7 +618,7 @@ interface ModalProps {
                 
                  {isAddBtnPressed ?
 
-<button type='submit' className="flex flex-row px-5 cursor-pointer shadow  bg-transparent  border-[1px] border-[#D9D9D9]    hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 items-center mx-auto w-fit my-5 gap-1 py-2 rounded-lg" disabled={isAddBtnPressed}>
+<button type='submit' className="flex flex-row px-5 cursor-not-allowed shadow  bg-transparent  border-[1px] border-[#D9D9D9]    hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 items-center mx-auto w-fit my-5 gap-1 py-2 rounded-lg" disabled={isAddBtnPressed}>
 <span className='sr-only'>Loading...</span>
 
 <div className='h-2 w-2 bg-[#D9D9D9] rounded-full animate-bounce [animation-delay:-0.3s]'></div>

@@ -282,11 +282,7 @@ const Profile = () => {
 
 </div>
 
-<button className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mt-10 lg:mt-2  rounded-lg px-2 py-1 cursor-pointer flex flex-row justify-center items-center gap-1" > 
-<i className="fa-solid fa-calendar-days text-center text-xs text-[#2C384A]"></i>
-<span className="font-semibold  text-sm text-center ">View Schedules</span>
 
-</button>
 <div className="grid grid-cols-2 gap-4 mt-4 lg:mt-8">   
 <label style={{ border: "1px solid #D9D9D9", borderRadius: "0.5rem" }} htmlFor="" className="relative flex flex-col">
   <span  className="absolute top-[-9px] h-fit mx-2 px-1 rounded-lg  bg-white z-20 text-xs text-[#333333]">Full name:</span>

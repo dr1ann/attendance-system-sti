@@ -396,12 +396,18 @@ const handleExport = () => {
                             {editingRowId === schedule.id ? 
                               <div className="space-y-6">
                               <UpdateAttendanceStatus
+                                studentName={schedule?.studentName}
                                 currentAttendanceStatus={schedule?.attendanceStatus}
                                   setRefetch={() => setRefetch(true)}
                                   isVisible={editingRowId === schedule.id}
                                   onClose={() => setEditingRowId(null)}
                                   scheduleId={schedule.id}
                                   teacherName={schedule?.teacherName}
+                                  subject={schedule?.subject}
+                                  roomNum={schedule?.roomNum}
+                                  scheduledDate={schedule?.scheduledDate}
+                                  scheduledInTime={schedule?.scheduledInTime}
+                                  scheduledOutTime={schedule?.scheduledOutTime}
                               />
 
                               <AlertDialog>
@@ -542,12 +548,18 @@ const handleExport = () => {
                             {editingRowId === schedule.id ? 
                               <div className="space-y-6">
                               <UpdateAttendanceStatus
-                                  currentAttendanceStatus={schedule?.attendanceStatus}
-                                  setRefetch={() => setRefetch(true)}
-                                  isVisible={editingRowId === schedule.id}
-                                  onClose={() => setEditingRowId(null)}
-                                  scheduleId={schedule.id}
-                                  teacherName={schedule?.teacherName}
+                                    studentName={schedule?.studentName}
+                                    currentAttendanceStatus={schedule?.attendanceStatus}
+                                    setRefetch={() => setRefetch(true)}
+                                    isVisible={editingRowId === schedule.id}
+                                    onClose={() => setEditingRowId(null)}
+                                    scheduleId={schedule.id}
+                                    teacherName={schedule?.teacherName}
+                                    subject={schedule?.subject}
+                                    roomNum={schedule?.roomNum}
+                                    scheduledDate={schedule?.scheduledDate}
+                                    scheduledInTime={schedule?.scheduledInTime}
+                                    scheduledOutTime={schedule?.scheduledOutTime}
                               />
 
                               <AlertDialog>

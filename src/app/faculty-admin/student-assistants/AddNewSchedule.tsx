@@ -94,7 +94,57 @@ interface ModalProps {
         studentName: studentName
       };
   
-      // Combine date and time into DateTime string
+     
+  
+      // Validate fields
+      let isValid = true;
+  
+      if (!trimmedScheduleData.teacherName) {
+        setIsTeacherNameEmpty(true);
+        isValid = false;
+      } else {
+        setIsTeacherNameEmpty(false);
+      }
+      if (!trimmedScheduleData.scheduledDate) {
+        setIsScheduledDateEmpty(true);
+        isValid = false;
+        console.log('first')
+      } else {
+        setIsScheduledDateEmpty(false);
+      }
+      if (!trimmedScheduleData.scheduledInTime) {
+        setIsScheduledInTimeEmpty(true);
+        isValid = false;
+      } else {
+        setIsScheduledInTimeEmpty(false);
+      }
+      if (!trimmedScheduleData.scheduledOutTime) {
+        setIsScheduledOutTimeEmpty(true);
+        isValid = false;
+      } else {
+        setIsScheduledOutTimeEmpty(false);
+      }
+      if (!trimmedScheduleData.roomNum) {
+        setIsRoomNumEmpty(true);
+        isValid = false;
+      } else {
+        setIsRoomNumEmpty(false);
+      }
+      if (!trimmedScheduleData.subject) {
+        setIsSubjectEmpty(true);
+        isValid = false;
+      } else {
+        setIsSubjectEmpty(false);
+      }
+      if (!trimmedScheduleData.gender) {
+        setIsGenderEmpty(true);
+        isValid = false;
+      } else {
+        setIsGenderEmpty(false);
+      }
+  
+      if (isValid) {
+         // Combine date and time into DateTime string
       const combinedDateTime = combineDateTime(trimmedScheduleData.scheduledDate, trimmedScheduleData.scheduledInTime);
   
       // Replace the scheduledDate with the combinedDateTime
@@ -103,54 +153,6 @@ interface ModalProps {
         scheduledDate: combinedDateTime,
         
       };
-  
-      // Validate fields
-      let isValid = true;
-  
-      if (!scheduleDataWithDateTime.teacherName) {
-        setIsTeacherNameEmpty(true);
-        isValid = false;
-      } else {
-        setIsTeacherNameEmpty(false);
-      }
-      if (!scheduleDataWithDateTime.scheduledDate) {
-        setIsScheduledDateEmpty(true);
-        isValid = false;
-      } else {
-        setIsScheduledDateEmpty(false);
-      }
-      if (!scheduleDataWithDateTime.scheduledInTime) {
-        setIsScheduledInTimeEmpty(true);
-        isValid = false;
-      } else {
-        setIsScheduledInTimeEmpty(false);
-      }
-      if (!scheduleDataWithDateTime.scheduledOutTime) {
-        setIsScheduledOutTimeEmpty(true);
-        isValid = false;
-      } else {
-        setIsScheduledOutTimeEmpty(false);
-      }
-      if (!scheduleDataWithDateTime.roomNum) {
-        setIsRoomNumEmpty(true);
-        isValid = false;
-      } else {
-        setIsRoomNumEmpty(false);
-      }
-      if (!scheduleDataWithDateTime.subject) {
-        setIsSubjectEmpty(true);
-        isValid = false;
-      } else {
-        setIsSubjectEmpty(false);
-      }
-      if (!scheduleDataWithDateTime.gender) {
-        setIsGenderEmpty(true);
-        isValid = false;
-      } else {
-        setIsGenderEmpty(false);
-      }
-  
-      if (isValid) {
         addSchedule(scheduleDataWithDateTime);
       }
     };
@@ -167,7 +169,7 @@ interface ModalProps {
           body: JSON.stringify({ ...scheduleData }), // Pass studentId along with other schedule data
         });
   
-        const data = await response.json();
+       
   
         if (response.status === 201) {
           setNewSchedule({
@@ -436,7 +438,7 @@ Subject cannot be empty
                                   </div>
                               )}
                               {isAddBtnPressed ? (
-                                  <button type='submit' className="flex flex-row px-5 cursor-pointer shadow bg-transparent border-[1px] border-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 items-center mx-auto w-fit my-5 gap-1 py-2 rounded-lg" disabled={isAddBtnPressed}>
+                                  <button type='submit' className="flex flex-row px-5 cursor-not-allowed shadow bg-transparent border-[1px] border-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 items-center mx-auto w-fit my-5 gap-1 py-2 rounded-lg" disabled={isAddBtnPressed}>
                                       <span className='sr-only'>Loading...</span>
                                       <div className='h-2 w-2 bg-[#D9D9D9] rounded-full animate-bounce [animation-delay:-0.3s]'></div>
                                       <div className='h-2 w-2 bg-[#D9D9D9] rounded-full animate-bounce [animation-delay:-0.15s]'></div>

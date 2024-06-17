@@ -28,25 +28,40 @@ model User {
   gender         String?
   createdAt      DateTime @default(now())
   schedules      Schedule[] 
+  activityLogs   ActivityLog[]
   @@index([role])
 }
 
 model Schedule {
   id                String   @id @default(cuid())
   studentId         String?
-  student           User?     @relation(fields: [studentId], references: [id])
+  studentName       String?
+  student           User?    @relation(fields: [studentId], references: [id], onDelete: Cascade) // onDelete: Cascade here
   teacherName       String?
   scheduledDate     DateTime
   scheduledInTime   String
   scheduledOutTime  String
   roomNum           String?
   subject           String?
-  attendanceStatus  String?   @default("PENDING")
+  attendanceStatus  String?  @default("PENDING")
   gender            String?
   createdAt         DateTime @default(now())
-  studentName       String?
 }
 
+model ActivityLog {
+  id            String   @id @default(cuid())
+  studentId         String
+  student           User?     @relation(fields: [studentId], references: [id], onDelete: Cascade) // onDelete: Cascade here
+ studentName       String?
+  subject           String
+  roomNum           String
+  scheduledDate     DateTime
+  scheduledInTime   String
+  scheduledOutTime  String
+  activity          String
+  attendanceStatus  String
+  createdAt         DateTime @default(now())
+}
 
 
 

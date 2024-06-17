@@ -17,6 +17,8 @@ import MoreInfo from "./MoreInfo"
 import PaginationControls from "./PaginationControls"
 import RemoveStudent from "./RemoveStudent"
 import ScheduleInfo from "./ScheduleInfo"
+import ScheduleList from "./ExportAllSchedules"
+import StudentsList from "./ExportAllStudentInfo"
 
 //Images
 import studentassistants from '@/app/Images/studentassistant.png'
@@ -25,7 +27,11 @@ import femaleProf from '@/app/Images/female-prof.png'
 import profile from '@/app/Images/profile.png'
 import nothinghere from '@/app/Images/noneplaceholder.png'
 import AddNewSchedule from "./AddNewSchedule"
-import ScheduleList from "./PrintAllSchedules"
+import ActivityLog from "./ActivityLog"
+import ActivityLogList from "./ExportAllActivity"
+
+
+
 
 
 
@@ -38,19 +44,18 @@ export default function StudentAssistants({
 }) {
     const [isAddNewScheduleOpen, setIsAddNewScheduleOpen] = useState(false);
     const [isAddNewModalOpen, setIsAddNewModalOpen] = useState(false);
+    const [isActivityLogOpen, setIsActivityLogOpen] = useState(false);
     const [isMoreInfoModalOpen, setIsMoreInfoModalOpen] = useState(false);
+
     const [isScheduleInfoOpen, setIsScheduleInfoOpen] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [isFetchSuccessful, setIsFetchSuccessful] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [currentStudentId, setCurrentStudentId] = useState('');
-    const [currentStudentRefId, setCurrentStudentRefId] = useState('');
     const [currentStudentName, setCurrentStudentName] = useState('');
- 
     const [refetch, setRefetch] = useState<boolean>(false);
     const [sortOption, setSortOption] = useState<'name' | 'newest' | 'oldest'>('name');
     const [sortedStudents, setSortedStudents] = useState<User[]>([]);
-    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState<boolean>(true);
     const [studentData, setStudentData] = useState<User[]>([]);
 
     
@@ -161,6 +166,8 @@ export default function StudentAssistants({
       }
       }, [refetch]);
 
+
+      
       const sortNewestToOldest = useMemo(() => {
         return [...studentData].sort((a, b) => {
           const createdAtA = a?.createdAt ? new Date(a?.createdAt).getTime() : 0;
@@ -209,7 +216,7 @@ export default function StudentAssistants({
     
       const paginatedEntries  = sortedStudents.slice(start, end)
     
-
+      
 
 
       if (isLoading) {
@@ -235,15 +242,26 @@ export default function StudentAssistants({
     setCurrentStudentId(studentId);
     setIsMoreInfoModalOpen(true);
   };
-   
+
+  const handleActivityLogClick = (e:React.MouseEvent<HTMLButtonElement>, studentId: string, studentName: string) => {
+    e.preventDefault();
+    setCurrentStudentId(studentId);
+
+    setCurrentStudentName(studentName);
+    
+    setIsActivityLogOpen(true);
+
+  };
+
   const handleAddNewScheduleClick = (e:React.MouseEvent<HTMLButtonElement>, studentId: string, studentName: string) => {
     e.preventDefault();
     setCurrentStudentId(studentId);
-    
+
     setCurrentStudentName(studentName);
 
     setIsAddNewScheduleOpen(true);
   };
+
   const handleScheduleInfoClick = (e:React.MouseEvent<HTMLButtonElement>, studentId: string, studentName: string) => {
     e.preventDefault();
     setCurrentStudentId(studentId);
@@ -265,8 +283,8 @@ export default function StudentAssistants({
                   <div className="p-0 lg:p-4 overflow-y-auto mt-[3em] lg:mt-[4em] rounded-lg">
                          <div className="lg:hidden animate-fadeUp">
              
-         
-             <form className="flex flex-row items-center w-fit space-x-2">
+                         <div className="flex flex-row justify-between items-center">
+                         <form className="flex flex-row items-center w-fit space-x-2">
           <label htmlFor="sort" className="text-sm font-medium whitespace-nowrap">Sort by:</label>
           <select
             id="sort"
@@ -280,6 +298,10 @@ export default function StudentAssistants({
             <option value="oldest">Oldest - Newest</option>
           </select>
         </form>
+
+                         </div>
+
+           
                   <button onClick={(e:React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); setIsAddNewModalOpen(true) } }  className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit ml-auto  my-6  rounded-lg px-3 py-1 mr-2 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
                       <i className="fa-solid fa-user-plus text-xs lg:text-sm text-center text-[#2C384A]"></i>
                       <span  className="font-semibold text-sm text-center">Add New Student Assistant</span>
@@ -340,7 +362,7 @@ export default function StudentAssistants({
                           <span className="font-semibold text-sm text-center ">View Schedules</span>
                       
                  </button>
-                 <button  className=" bg-transparent  border-[1px] border-[#D9D9D9] ml-auto  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
+                 <button onClick={(e) => handleActivityLogClick(e, student?.id, student?.name)}  className=" bg-transparent  border-[1px] border-[#D9D9D9] ml-auto  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
                   <i className="fa-solid fa-chart-line text-xs text-center text-[#2C384A]"></i>
                   <span className="font-semibold text-sm text-center">Activity Log</span>
               
@@ -369,24 +391,15 @@ export default function StudentAssistants({
           <div style={{border: "1px solid #D9D9D9"}} className="flex flex-col gap-6 justify-center mx-auto items-center mb-10 lg:mb-6 w-fit p-4 rounded-lg shadow drop-shadow ">
               <div className="flex  items-center justify-center gap-1">
               <i className="fa-solid fa-print text-base text-[#2C384A]"></i>
-              <h1 className="font-bold text-base text-center">PRINT ALL</h1>
+              <h1 className="font-bold text-base text-center">EXPORT ALL</h1>
           </div>
              
               <ul className="grid grid-cols-3 gap-6 justify-center items-center">
              
-              <li className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 cursor-pointer gap-1 flex items-center justify-center  p-2 rounded-lg ">
-                 
-                      <i className="fa-solid fa-circle-info text-lg text-[#2C384A]"></i>
-                      <span  className="font-semibold text-sm text-center">Info</span>
-                  
-              </li>
-              <ScheduleList />
-          <li className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 cursor-pointer gap-1 flex items-center justify-center  p-2 rounded-lg ">
-                 
-              <i className="fa-solid fa-chart-line text-lg text-[#2C384A]"></i>
-              <span  className="font-semibold text-sm text-center">Activity Log</span>
-          
-      </li>
+              <StudentsList  />
+              <ScheduleList  />
+              <ActivityLogList />
+        
               
           </ul>
           
@@ -494,7 +507,7 @@ export default function StudentAssistants({
              
               </td>
               <td className="bg-gray-100  h-full shadow drop-shadow px-4 py-2">
-                  <button id="showActivity" className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto  rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
+                  <button  onClick={(e) => handleActivityLogClick(e, student?.id, student?.name)}  className="shadow  bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 w-fit mx-auto  rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
                       <i className="fa-solid fa-chart-line text-xs text-center text-[#2C384A]"></i>
                       <span className="font-semibold text-sm text-center">View Activity Log</span>
                     
@@ -554,6 +567,7 @@ export default function StudentAssistants({
           <MoreInfo setRefetch={() => setRefetch(true)} currentId={currentStudentId} isVisible={isMoreInfoModalOpen} onClose={() => setIsMoreInfoModalOpen(false)} />
           <ScheduleInfo setRefetch={() => setRefetch(true)} studentId={currentStudentId} studentName={currentStudentName} isVisible={isScheduleInfoOpen} onClose={() => setIsScheduleInfoOpen(false)} />
           <AddNewSchedule studentId={currentStudentId} studentName={currentStudentName}  setRefetch={() => setRefetch(true)} isVisible={isAddNewScheduleOpen} onClose={() => setIsAddNewScheduleOpen(false)} />
+          <ActivityLog  studentId={currentStudentId} studentName={currentStudentName} isVisible={isActivityLogOpen} onClose={() => setIsActivityLogOpen(false)} />
           <Footer />
         </div>
       ) : (

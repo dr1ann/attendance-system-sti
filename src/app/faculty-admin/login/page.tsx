@@ -106,10 +106,20 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
       setIsLoginPressed(true);
 
       // Check if either username or password is empty
-      if (username.trim() === '' || password.trim() === '') {
+      if (username.trim() === '' && password.trim() === '' ) {
           setIsUsernameEmpty(true);
           setIsPasswordEmpty(true);
           return;
+      }
+      
+      if(username.trim() === '') {
+        setIsUsernameEmpty(true);
+        return;
+      }
+
+      if(password.trim() === '') {
+        setIsPasswordEmpty(true);
+        return;
       }
     
       const loginResponse = await fetch('/api/login-faculty', {

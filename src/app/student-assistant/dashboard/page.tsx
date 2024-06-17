@@ -130,7 +130,7 @@ console.log(data)
   fetchUserSchedule();
 }, [userData?.id]);
 
-console.log(upcomingSchedules)
+
 
 const formatTime = (timeString: string) => {
   return moment(timeString, 'HH:mm').format('hh:mm A');
@@ -209,15 +209,15 @@ return (
           {upcomingSchedules?.map((schedule: Schedule) => (
             <tr key={schedule?.id}>
               <th scope="row" className="px-6 py-3 text-center text-sm font-semibold text-black lg:text-base bg-gray-100 h-full shadow drop-shadow">
-                {schedule?.teacherName}
+                {schedule?.teacherName || 'N/A'}
               </th>
               <td className="px-6 py-3 text-center text-sm lg:text-base bg-gray-100 text-black h-full shadow drop-shadow">
-                {schedule?.roomNum}
+                {schedule?.roomNum || 'N/A'}
               </td>
               <td className="px-6 py-3 text-center text-sm lg:text-base bg-gray-100 text-black h-full shadow drop-shadow">
-                {formatDate(schedule?.scheduledDate)}
+                {formatDate(schedule?.scheduledDate) || 'N/A'}
                 <br />
-                ({formatTime(schedule?.scheduledInTime)} - {formatTime(schedule?.scheduledOutTime)})
+                ({formatTime(schedule?.scheduledInTime) || 'N/A'} - {formatTime(schedule?.scheduledOutTime) || 'N/A'})
               </td>
             </tr>
           ))}
@@ -235,16 +235,13 @@ return (
         </div>
     
          
-        <div className="text-black  flex flex-row overflow-x-auto   shadow drop-shadow smallscreens:w-fit  bg-gray-100 mx-auto  mt-6 rounded-lg">
+        <div className="text-black  flex flex-row overflow-x-auto gap-10  shadow drop-shadow smallscreens:w-fit  bg-gray-100 mx-auto  mt-6 rounded-lg">
                
             <Link href="/student-assistant/attendance" className="flex min-w-32 w-32 lg:w-40 justify-center flex-col m-4 lg:m-6 items-center cursor-pointer rounded-md shadow  bg-white  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 pb-2">
                 <Image src={attendance} className="w-20 lg:w-28 h-auto " alt="" />
                 <p className="text-sm lg:text-base  font-bold text-center px-4">ATTENDANCE</p>
             </Link>
-            <Link href="/student-assistant/notifications" className="flex min-w-32 w-32 lg:w-40 justify-center flex-col m-4 lg:m-6 items-center cursor-pointer rounded-md shadow  bg-white  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 pb-2">
-                <Image src={notifications} className="w-20 lg:w-28 h-auto" alt="" />
-                <p className="text-sm lg:text-base  font-bold text-center px-4 text-wrap">NOTIFICATIONS</p>
-            </Link>
+           
            
             <Link href="/student-assistant/profile" className="flex min-w-32 w-32 lg:w-40 justify-center flex-col m-4 lg:m-6 items-center cursor-pointer rounded-md shadow  bg-white  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 pb-2">
                 <Image src={profile} className="w-20 lg:w-28 h-auto" alt="" />

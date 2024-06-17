@@ -17,7 +17,7 @@ import logo from '@/app/Images/logo.png';
 const facultyAdminSidebarItems = [
   { path: 'dashboard', icon: dashboard, title: 'Dashboard' },
   { path: 'student-assistants', icon: studentassistants, title: 'Student Assistants' },
-  { path: 'notifications', icon: notifications, title: 'Notifications' },
+  
   { path: 'profile', icon: profile, title: 'Profile' },
 ];
 
@@ -25,7 +25,7 @@ const facultyAdminSidebarItems = [
 const studentAssistantsSidebarItems = [
   { path: 'dashboard', icon: dashboard, title: 'Dashboard' },
   { path: 'attendance', icon: attendance, title: 'Attendance' },
-  { path: 'notifications', icon: notifications, title: 'Notifications' },
+ 
   { path: 'profile', icon: profile, title: 'Profile' },
 ];
 

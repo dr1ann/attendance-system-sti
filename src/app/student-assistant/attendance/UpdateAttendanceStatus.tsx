@@ -17,14 +17,20 @@ import {
 
 interface ModalProps {
     scheduleId: string;
+    studentName: string | null | undefined;
     teacherName: string | null;
+    subject: string | null;
+    roomNum: string | null;
+    scheduledDate: Date | string;
+    scheduledInTime: string | null;
+    scheduledOutTime: string | null;
     setRefetch: () => void;
     isVisible: boolean;
     onClose: () => void;
     currentAttendanceStatus: string | null;
 }
 
-const UpdateAttendanceStatus: React.FC<ModalProps> = ({ isVisible, currentAttendanceStatus, teacherName, setRefetch, onClose, scheduleId }) => {
+const UpdateAttendanceStatus: React.FC<ModalProps> = ({ isVisible, currentAttendanceStatus, teacherName, studentName, subject, roomNum, scheduledDate, scheduledInTime, scheduledOutTime, setRefetch, onClose, scheduleId }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
     const [isSaveButtonPressed, setIsSaveButtonPressed] = useState(false)
@@ -36,54 +42,64 @@ const UpdateAttendanceStatus: React.FC<ModalProps> = ({ isVisible, currentAttend
     const handleUpdate = async (status: string) => {
         try {
             setIsSaveButtonPressed(true);
+    
+            // Update attendance status and create activity log
             const response = await fetch('/api/update-attendance-status', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ scheduleId, attendanceStatus: status }),
+                body: JSON.stringify({
+                     scheduleId, 
+                     studentName,
+                     subject,
+                     roomNum,
+                     scheduledDate,
+                     scheduledInTime,
+                     scheduledOutTime,
+                     attendanceStatus: status 
+                    
+                    }),
             });
-
-            
-
+    
             if (!response.ok) {
-                 setConfirmationMessage('')
+                setConfirmationMessage('');
                 setIsStatusUpdated(false);
                 setErrorMessage('Error updating attendance status');
-                
-            } 
-                setRefetch();
-                setErrorMessage('');
-                setIsStatusUpdated(true);
-                setConfirmationMessage(`Teacher ${teacherName} was marked as ${status.toLowerCase()}`);
-            
+                return; 
+            }
+    
+         
+            setRefetch();
+            setErrorMessage('');
+            setIsStatusUpdated(true);
+            setConfirmationMessage(`Teacher ${teacherName} was marked as ${status.toLowerCase()}`);
         } catch (error) {
             setIsStatusUpdated(false);
-            setConfirmationMessage('')
+            setConfirmationMessage('');
             setErrorMessage('Internal Server Error');
             console.error('Error updating attendance status:', error);
-
         } finally {
-          
             setIsConfirmationShown(true);
+            onClose();
             setTimeout(() => {
                 setIsSaveButtonPressed(false);
                 setIsConfirmationShown(false);
-                onClose();
-            }, 1500); // Show confirmation for 1.5 seconds before hiding
-           
+              
+            }, 1500); 
+          
         }
     };
-
+    
     const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault()
+        e.preventDefault();
         if (selectedStatus) {
-            handleUpdate(selectedStatus);           
+            handleUpdate(selectedStatus);
+              console.log(isConfirmationShown)
         }
-
     };
-
-    console.log(isStatusUpdated)
+    
+    
 
     if (!isVisible) {
         return null;

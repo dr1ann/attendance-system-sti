@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
     try {
       // Fetch all schedules without filtering by user ID
       const schedules = await prisma.schedule.findMany();

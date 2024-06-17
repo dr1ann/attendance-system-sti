@@ -78,7 +78,7 @@ const [isEditMode, setIsEditMode] = useState(false);
               throw new Error(`HTTP error! Status: ${response.status}`);
             }
     
-            const data = await response.json();
+            const data : User = await response.json();
             setOriginalStudentInfo(data); 
 
           
@@ -603,7 +603,7 @@ Yes
 <>
 {isSavePressed 
 ?
-<button type='submit' className="flex flex-row px-5 cursor-pointer shadow  bg-transparent  border-[1px] border-[#D9D9D9]    hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 items-center mx-auto w-fit mt-6 gap-1 py-3 rounded-lg" disabled={isSavePressed} >
+<button type='submit' className="flex flex-row px-5 cursor-not-allowed shadow  bg-transparent  border-[1px] border-[#D9D9D9]    hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 items-center mx-auto w-fit mt-6 gap-1 py-3 rounded-lg" disabled={isSavePressed} >
 <span className='sr-only'>Loading...</span>
 
 <div className='h-2 w-2 bg-[#D9D9D9] rounded-full animate-bounce [animation-delay:-0.3s]'></div>
