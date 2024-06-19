@@ -224,12 +224,15 @@ export default function StudentAssistants({
          <PageLoader/>
         );
       }
-      function formatDate(timestamp: Date): string {
+      function formatCreatedAtDate(timestamp: Date): string {
         const date = new Date(timestamp);
         const options: Intl.DateTimeFormatOptions = {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true, // Use 12-hour clock
         };
         return new Intl.DateTimeFormat('en-US', options).format(date);
       }
@@ -335,7 +338,7 @@ export default function StudentAssistants({
                           <div className="flex flex-row items-center space-x-3">
                             <div className="flex flex-row items-center space-x-1">
                           <h4 className="text-xs  text-[#333333]">Joined on: </h4> 
-                          <span className="text-sm  font-semibold"> {formatDate(student?.createdAt) || 'N/A'}</span>
+                          <span className="text-sm  font-semibold"> {formatCreatedAtDate(student?.createdAt) || 'N/A'}</span>
                           </div>
                           <button   onClick={(e) => handleMoreInfoClick(e, student?.id)} className=" bg-transparent  border-[1px] border-[#D9D9D9]  hover:bg-[#D9D9D9]  hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 shadow  w-fit ml-3   rounded-lg px-2 py-1 cursor-pointer flex  justify-center flex-row items-center gap-1" > 
                           <i className="fa-solid fa-circle-info text-xs text-center text-[#2C384A]"></i>
@@ -476,7 +479,7 @@ export default function StudentAssistants({
                        
                           <div className="flex flex-col ">
                               <span className="text-xs  text-[#333333] ">Joined on: <br/></span> 
-                              <h4 className="font-semibold text-sm ">{formatDate(student?.createdAt) || 'N/A'}</h4>
+                              <h4 className="font-semibold text-sm ">{formatCreatedAtDate(student?.createdAt) || 'N/A'}</h4>
                               </div>
                       </div>
                       <button onClick={(e) => handleMoreInfoClick(e, student?.id)} 

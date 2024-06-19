@@ -138,7 +138,16 @@ const ChangePassword : React.FC<ModalProps> =  ({setRefetch, currentId, isVisibl
             }  else {
                 setConfNewPassErrorMessage('');
             }
-    
+            if (newPassword?.trim() !== '' && confirmNewPassword?.trim() !== '') {
+                if (newPassword?.trim() !== confirmNewPassword?.trim()) {
+                    setNewPassErrorMessage("New password and confirmation password do not match.");
+                    setConfNewPassErrorMessage("New password and confirmation password do not match.");
+                    isValid = false
+                } else {
+                    setNewPassErrorMessage('');
+                    setConfNewPassErrorMessage('');
+                }
+            }
             // If any validation fails, stop the form submission
             if (!isValid) {
                 return;

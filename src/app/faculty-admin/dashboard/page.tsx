@@ -240,7 +240,7 @@ function formatCreatedAtDate(timestamp: Date): string {
                   ) : (
                       <div className="flex flex-col gap-3 items-center justify-center mb-4">
        <Image priority src={noneplaceholder} className='w-[12rem] lg:w-[20rem] h-auto' alt='nothing here' />
-    <p className='text-center text-black text-xl lg:text-2xl font-semibold'>There are currently no Student Activities</p>
+    <p className='text-center text-black text-lg lg:text-xl font-semibold'>There are currently No Student Activities</p>
     </div>
     
   )}
