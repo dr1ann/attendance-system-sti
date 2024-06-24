@@ -97,7 +97,7 @@ const ActivityLog: React.FC<ModalProps> = ({ isVisible, onClose, studentId, stud
     
 
     const handleExport = () => {
-        ExportActivityLog(sortedActivities, studentName, `${studentName} 's Activity Log`);
+        ExportActivityLog(sortedActivities, studentName, `${studentName}'s Activity Log`);
       };
 
     if (!isVisible)  return null
@@ -195,7 +195,7 @@ const ActivityLog: React.FC<ModalProps> = ({ isVisible, onClose, studentId, stud
                                </div>
                         
                             ) : (
-                                <p className="px-4 py-2 text-center font-semibold">No schedule(s) found for this student.</p>
+                                <p className="px-4 py-2 text-center font-semibold">No activities found for this student.</p>
                             )}
                         </>
                     )}

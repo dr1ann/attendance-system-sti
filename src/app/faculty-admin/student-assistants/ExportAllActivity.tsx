@@ -34,7 +34,7 @@ const ActivityLogList = () => {
         });
 
         if (!response.ok) {
-          setError('Failed to Export Students Activity Log')
+          setError('No activity logs found to export')
           throw new Error('Failed to fetch students Info');
         }
 
@@ -42,7 +42,7 @@ const ActivityLogList = () => {
         const data: ActivityLog[] = await response.json();
         ExportAllActivityLog(data, 'Student Assistants Activity Log Report');
       } catch (error) {
-        setError("Failed to Export Students Activity Log");
+        setError('No activity logs found to export')
      
       } finally {
         setRefetch(false)
@@ -71,7 +71,7 @@ const ActivityLogList = () => {
 :
 <button onClick={handleExport} disabled={isExportBtnPressed} className="shadow bg-transparent border-[1px] border-[#D9D9D9] hover:bg-[#D9D9D9] hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0 cursor-pointer gap-1 flex items-center justify-center p-2 rounded-lg ">
       <i className="fa-solid fa-chart-line text-lg text-[#2C384A]"></i>
-      <span className="font-semibold text-sm text-center">Activity Log</span>
+      <span className="font-semibold text-sm text-center">Activity Logs</span>
     </button>
 }
     

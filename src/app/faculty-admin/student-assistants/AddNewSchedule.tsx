@@ -221,7 +221,7 @@ interface ModalProps {
                       {/* Modal header */}
                       <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t gap-2">
                           <h3 className="text-lg lg:text-xl font-bold text-gray-900">
-                              <i className="fa-solid fa-user-plus text-base lg:text-lg text-center text-[#2C384A]"></i> {'Add New Schedule for ' + studentName}
+                              <i className="fa-solid fa-calendar-plus text-base lg:text-lg text-center text-[#2C384A]"></i> {'Add New Schedule for ' + studentName}
                           </h3>
                           <button onClick={(e) => { e.preventDefault(); onClose(); }} type="button" className="text-gray-400 bg-transparent hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="add-modal">
                               <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
