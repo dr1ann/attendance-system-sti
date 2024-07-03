@@ -1,11 +1,11 @@
-'use client'
-import React, { ChangeEvent, FormEvent, useState } from 'react';
+"use client";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 
 function YourComponent() {
   const [formData, setFormData] = useState({
-    name: '',
-    username: '',
-    password: '',
+    name: "",
+    username: "",
+    password: "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -14,15 +14,15 @@ function YourComponent() {
       [e.target.name]: e.target.value,
     });
   };
-console.log(formData)
+  console.log(formData);
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
+      const response = await fetch("/api/users", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -30,19 +30,19 @@ console.log(formData)
       if (response.ok) {
         // If the request was successful, reset the form data
         setFormData({
-          name: '',
-          username: '',
-          password: '',
+          name: "",
+          username: "",
+          password: "",
         });
-        alert('Faculty admin added successfully!');
+        alert("Faculty admin added successfully!");
       } else {
         // If the request failed, show an error message
         const errorMessage = await response.text();
         throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to add faculty admin. Please try again.');
+      console.error("Error:", error);
+      alert("Failed to add faculty admin. Please try again.");
     }
   };
 

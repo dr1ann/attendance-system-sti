@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const Protected = () => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const router = useRouter();
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/protected-route', {
-          method: 'GET',
+        const response = await fetch("/api/protected-route", {
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          credentials: 'include', // Include cookies in the request
+          credentials: "include", // Include cookies in the request
         });
 
         // Check if the response is successful (status 200)
@@ -33,33 +33,31 @@ const Protected = () => {
 
     fetchData();
   }, []);
-  
+
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
+      const response = await fetch("/api/logout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (response.ok) {
         // Redirect to login page after successful logout
-        router.push('/faculty-admin/login');
+        router.push("/faculty-admin/login");
       } else {
-        console.error('Failed to logout');
+        console.error("Failed to logout");
       }
     } catch (error) {
-      console.error('An error occurred during logout:', error);
+      console.error("An error occurred during logout:", error);
     }
   };
   return (
     <div>
       <h1>Protected Page</h1>
       <p>{message}</p>
-      <button onClick={handleLogout}>
-      Logout
-    </button>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 };
